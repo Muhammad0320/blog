@@ -1,0 +1,26 @@
+Dependency directories
+node_modules/
+
+Compiled TypeScript files
+dist/
+*.tsbuildinfo
+
+Log files
+.log
+npm-debug.log
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+Environment variables
+.env
+.env.local
+.env.*.local
+
+IDE and editor directories
+.vscode/
+.idea/
+
+OS-generated files
+.DS_Store
+Thumbs.db
