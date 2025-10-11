@@ -32,6 +32,7 @@ postRoutes.get("/posts", PostController.handleGetAllPosts);
 postRoutes.post("/posts", PostController.handleCreatePost);
 
 postRoutes.get("/posts/:id", validatePostId, PostController.handleGetPostById);
+postRoutes.patch("/posts/:id", validatePostId, PostController.handleUpdatePost);
 postRoutes.delete(
   "/posts/:id",
   validatePostId,

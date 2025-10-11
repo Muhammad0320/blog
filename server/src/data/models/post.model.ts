@@ -65,7 +65,7 @@ export class PostModel {
     }
   }
 
-  static async delete(id: number): Promise<number | undefined> {
+  static async delete(id: number): Promise<number> {
     const sql = `DELETE FROM posts 
                   WHERE id = ?
                   `;
@@ -76,6 +76,49 @@ export class PostModel {
     } catch (error) {
       console.error("Error deleting post", error);
       throw new Error("Could not delete post");
+    }
+  }
+
+  /**
+   * Updates a post with new data.
+   * @param id The ID of the post to update.
+   * @param data An object containing the new title and/or content.
+   * @returns A promise that resolves to the number of affected rows.
+   */
+  static async update(
+    id: number,
+    data: { title?: string; content?: string }
+  ): Promise<number> {
+    const { title, content } = data;
+
+    const setParts: string[] = [];
+    const values: (string | number)[] = [];
+
+    if (title) {
+      setParts.push("title = ?");
+      values.push(title);
+    }
+    if (content) {
+      setParts.push("content = ?");
+      values.push(content);
+    }
+
+    if (setParts.length === 0) {
+      return 0;
+    }
+
+    const setClause = setParts.join(", ");
+    values.push(id);
+
+    const sql = `UPDATE posts SET ${setClause} WHERE id = ?`;
+
+    try {
+      const [result] = await pool.query<ResultSetHeader>(sql, values);
+
+      return result.affectedRows;
+    } catch (error) {
+      console.error("Error updating post", error);
+      throw new Error("Could not update post");
     }
   }
 }

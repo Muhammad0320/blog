@@ -69,4 +69,21 @@ export class PostController {
       res.status(500).json({ message: "Error deleting post" });
     }
   }
+
+  static async handleUpdatePost(req: RequestWithPostId, res: Response) {
+    try {
+      const postId = req.postId as number;
+      const { title, content } = req.body;
+
+      const affectdRow = await PostModel.update(postId, { title, content });
+      if (affectdRow) {
+        res.status(200).json({ message: "Post successfully updated" });
+      } else {
+        res.status(404).json({ message: "Post not found" });
+      }
+    } catch (error) {
+      console.error("Cannot update post", error);
+      res.status(500).json({ message: "Eror deleting post" });
+    }
+  }
 }
