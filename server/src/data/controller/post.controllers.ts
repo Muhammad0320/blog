@@ -1,6 +1,10 @@
 import { PostModel } from "../models/post.model";
 import { Request, Response } from "express";
 
+interface RequestWithPostId extends Request {
+  postId?: number;
+}
+
 // This class will handle all the logic for incoming requests related to posts.
 export class PostController {
   /**
@@ -33,14 +37,9 @@ export class PostController {
     }
   }
 
-  static async handleGetPostById(req: Request, res: Response) {
+  static async handleGetPostById(req: RequestWithPostId, res: Response) {
     try {
-      const { id } = req.params;
-      const postId = parseInt(id, 10);
-
-      if (isNaN(postId)) {
-        return res.status(400).json({ message: "Invalid post ID" });
-      }
+      const postId = req.postId as number;
 
       const post = await PostModel.getById(postId);
 
@@ -55,24 +54,19 @@ export class PostController {
     }
   }
 
-  static async handleDeletePost(req: Request, res: Response) {
+  static async handleDeletePost(req: RequestWithPostId, res: Response) {
     try {
-      const { id } = req.params;
-      const postId = parseInt(id, 10);
-
-      if (isNaN(postId)) {
-        return res.status(400).json({ message: "Invalid post ID" });
-      }
+      const postId = req.postId as number;
 
       const affectedRow = await PostModel.delete(postId);
       if (affectedRow) {
-        res.status(204).json({ message: "Post successfully deleted" });
+        res.status(204).send();
       } else {
         res.status(404).json({ message: "Post not found" });
       }
     } catch (error) {
       console.error("Cannot delete post", error);
-      res.status(500).json({ message: "Cannot delete post" });
+      res.status(500).json({ message: "Error deleting post" });
     }
   }
 }
