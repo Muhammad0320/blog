@@ -32,4 +32,47 @@ export class PostController {
       res.status(500).json({ message: "error creating post" });
     }
   }
+
+  static async handleGetPostById(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const postId = parseInt(id, 10);
+
+      if (isNaN(postId)) {
+        return res.status(400).json({ message: "Invalid post ID" });
+      }
+
+      const post = await PostModel.getById(postId);
+
+      if (post) {
+        res.status(200).json(post);
+      } else {
+        res.status(404).json({ message: "Post not found" });
+      }
+    } catch (error) {
+      console.error("Cannot fetch post:", error);
+      res.status(500).json({ message: "Cannot fetch post" });
+    }
+  }
+
+  static async handleDeletePost(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const postId = parseInt(id, 10);
+
+      if (isNaN(postId)) {
+        return res.status(400).json({ message: "Invalid post ID" });
+      }
+
+      const affectedRow = await PostModel.delete(postId);
+      if (affectedRow) {
+        res.status(204).json({ message: "Post successfully deleted" });
+      } else {
+        res.status(404).json({ message: "Post not found" });
+      }
+    } catch (error) {
+      console.error("Cannot delete post", error);
+      res.status(500).json({ message: "Cannot delete post" });
+    }
+  }
 }

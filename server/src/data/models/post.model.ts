@@ -56,12 +56,26 @@ export class PostModel {
             WHERE id = ?
             `;
     try {
-      const rows = await pool.query<Post[]>(sql, [id]);
+      const [rows] = await pool.query<Post[]>(sql, [id]);
 
-      return rows[0][0] || null;
+      return rows[0] || null;
     } catch (error) {
       console.error(`Error fetching post with id ${id}:`, error);
       throw new Error("Could not fetch post!");
+    }
+  }
+
+  static async delete(id: number): Promise<number | undefined> {
+    const sql = `DELETE FROM posts 
+                  WHERE id = ?
+                  `;
+    try {
+      const [result] = await pool.query<ResultSetHeader>(sql, [id]);
+
+      return result.affectedRows;
+    } catch (error) {
+      console.error("Error deleting post", error);
+      throw new Error("Could not delete post");
     }
   }
 }
