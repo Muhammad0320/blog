@@ -46,8 +46,22 @@ export class PostModel {
       const [result] = await pool.query<ResultSetHeader>(sql, values);
       return result.insertId;
     } catch (error) {
-      console.error("Error creatingg post:", error);
+      console.error("Error creating post:", error);
       throw new Error("Could not create post.");
+    }
+  }
+
+  static async getById(id: number): Promise<Post | null> {
+    const sql = `SELECT * FROM posts
+            WHERE id = ?
+            `;
+    try {
+      const rows = await pool.query<Post[]>(sql, [id]);
+
+      return rows[0][0] || null;
+    } catch (error) {
+      console.error(`Error fetching post with id ${id}:`, error);
+      throw new Error("Could not fetch post!");
     }
   }
 }
