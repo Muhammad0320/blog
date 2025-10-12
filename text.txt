@@ -1,0 +1,70 @@
+Allahu Akbar, I'm done with this one but I'm filled with doubt about this method it needs thorough refinement, for example if the post table has 30 fields how will I update without wasting bunch of time and keystrokes like this and should I use put instead of patch:  
+` static async update(
+    id: number,
+    data: { title?: string; content?: string }
+  ): Promise<number> {
+    const { title, content } = data;
+    if (!title && !content) {
+      return 0;
+    }
+
+    // Something better can be done here!
+    let sql: string;
+    let values: any[];
+    if (title && !content) {
+      sql = `UPDATE posts SET title = ? WHERE id = ?`;
+      values = [title, id];
+    } else if (!title && content) {
+      sql = `UPDATE posts SET content = ? WHERE id = ?`;
+      values = [content, id];
+    } else {
+      sql = `UPDATE posts SET title = ?, content = ? WHERE id = ? `;
+      values = [title, content, id];
+    }
+
+    try {
+      const [result] = await pool.query<ResultSetHeader>(sql, values);
+
+      return result.affectedRows;
+    } catch (error) {
+      console.error("Error updating post", error);
+      throw new Error("Could not update post");
+    }
+  }
+` The update method.
+
+`static async handleUpdatePost(req: RequestWithPostId, res: Response) {
+    try {
+      const postId = req.postId as number;
+      const { title, content } = req.body;
+
+      const affectdRow = await PostModel.update(postId, { title, content });
+      if (affectdRow) {
+        res.status(200).json({ message: "Post successfully updated" });
+      } else {
+        res.status(404).json({ message: "Post not found" });
+      }
+    } catch (error) {
+      console.error("Cannot update post", error);
+      res.status(500).json({ message: "Eror deleting post" });
+    }
+  }
+` The update controller
+ 
+`postRoutes.patch("/posts/:id", validatePostId, PostController.handleUpdatePost);
+` The update route 
+
+
+// I'm curious again; I think it should also connect to user model right?
+// But can we safely skip it for later right?
+CREATE TABLE comment (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  content TEXT NOT NULL,
+  author VARCHAR(255),
+  post_id INT NOT NULL, 
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (post_id) REFERENCES post(id) ON DELETE CASCADE
+)
+
+SELECT * FROM comments
+WHERE post_id = ?
