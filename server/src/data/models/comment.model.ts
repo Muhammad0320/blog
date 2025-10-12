@@ -11,7 +11,7 @@ export interface Comment extends RowDataPacket {
 
 interface NewCommentData {
   content: string;
-  post_id: number;
+  postId: number;
   author?: string;
 }
 
@@ -29,24 +29,26 @@ export class CommentModel {
   }
 
   static async create(data: NewCommentData): Promise<number> {
-    const { content, post_id, author } = data;
+    const { content, postId, author } = data;
 
     const sql = `
-        INSERT INTO comment (content, author, post_id) VALUES (?, ?, ?)
+        INSERT INTO comments (content, author, post_id) VALUES (?, ?, ?)
         `;
-    const values = [content, author, post_id];
+    const values = [content, author || null, postId];
 
     try {
       const [result] = await pool.query<ResultSetHeader>(sql, values);
 
       return result.insertId;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      /* I could have added a better type here; something better can be done, I should have left if but get error saying the error is of type unknow. */
       console.error("Error Creating comment: ", error);
 
-      if (error.code === "ER_NO_REFERENCED_ROW_2") {
-        throw new Error(
-          "Could not create comment. The specified post does not exist"
-        );
+      if (error && typeof error === "object" && "code" in error) {
+        if (error.code === "ER_NO_REFERENCED_ROW_2")
+          throw new Error(
+            "Could not create comment. The specified post does not exist"
+          );
       }
       throw new Error("Could not create comment");
     }
