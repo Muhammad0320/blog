@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { PostController } from "../controller/post.controllers";
 import { validatePostId } from "../middleware/validation.middleware";
+import { PostController } from "../controller/post.controller";
 
 const postRoutes = Router();
 

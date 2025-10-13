@@ -18,6 +18,8 @@ export const validatePostId = (
       .json({ message: "Invalid post ID. Must be a number." });
   }
 
+  console.log("---- Do you catch changes -----------------");
+
   req.postId = id;
   next();
 };

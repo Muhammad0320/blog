@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { CommentController } from "../controller/comment,controller";
 import { validatePostId } from "../middleware/validation.middleware";
+import { CommentController } from "../controller/comment.controller";
 
 const commentRouter = Router();
 
