@@ -11,35 +11,49 @@ export class CommentController {
 
       res.status(200).json(comments);
     } catch (error) {
-      console.error("Controller error: Error getting all comments", error);
-      throw new Error("Can not get all comments");
+      console.error("Controller error: Could not get commets for post", error);
+      res.status(500).json({ message: "Error fetching comments" });
     }
   }
 
-  static async handleCreate(req: Request, res: Response) {
+  static async handleCreate(req: RequestWithPostId, res: Response) {
     try {
-      const { content, postId, author } = req.body;
+      const postId = req.postId as number;
+      const { content, author } = req.body;
 
-      if (!content || !postId || !author) {
-        res
-          .status(400)
-          .json({ message: "content, postId and author field are requireed" });
+      if (!content) {
+        res.status(400).json({ message: "The 'content' field is required " });
       }
 
-      const affectedRow = await CommentModel.create({
+      const newCommentId = await CommentModel.create({
         content,
         postId,
         author,
       });
-      // Is this the right way of checking for a postid not found
-      if (affectedRow < 1) {
-        res.status(404).json({ message: "Post id not found!" });
+
+      res.json(201).json({
+        message: "Comment successfully created!",
+        commentId: newCommentId,
+      });
+    } catch (error) {
+      console.error("Contoller error: Could not create comment", error);
+
+      if (
+        error &&
+        typeof error === "object" &&
+        "message" in error &&
+        typeof error.message === "string"
+      ) {
+        if (error.message?.includes("post does not exist")) {
+          return res
+            .status(404)
+            .json({
+              message: "Cannot create comment for a post that does not exist",
+            });
+        }
       }
 
-      res.json(201).json({ message: "Comment successfully created!" });
-    } catch (error) {
-      console.error("Contoller error: Error creating new comment", error);
-      throw new Error("Cannot create comment");
+      res.status(500).json({ mesage: "Error creating comment" });
     }
   }
 }
