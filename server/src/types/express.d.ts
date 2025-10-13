@@ -1,7 +1,7 @@
 // express.d.ts
-import 'express';
+import "express";
 
-declare module 'express-serve-static-core' {
+declare module "express-serve-static-core" {
   interface Request {
     postId?: number;
   }
