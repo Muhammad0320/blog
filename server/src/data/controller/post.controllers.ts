@@ -1,9 +1,6 @@
+import { RequestWithPostId } from "../middleware/validatepostid";
 import { PostModel } from "../models/post.model";
 import { Request, Response } from "express";
-
-interface RequestWithPostId extends Request {
-  postId?: number;
-}
 
 // This class will handle all the logic for incoming requests related to posts.
 export class PostController {

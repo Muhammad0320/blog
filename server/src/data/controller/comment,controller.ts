@@ -1,10 +1,6 @@
 import { Request, Response } from "express";
 import { CommentModel } from "../models/comment.model";
-
-// I've repeated myself
-interface RequestWithPostId extends Request {
-  postId?: number;
-}
+import { RequestWithPostId } from "../middleware/validatepostid";
 
 export class CommentController {
   static async handleGetAllForPosts(req: RequestWithPostId, res: Response) {
