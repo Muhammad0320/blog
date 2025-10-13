@@ -9,7 +9,7 @@ interface RequestWithPostId extends Request {
 /**
  * Middleware to validate the post ID from the URL parameters.
  */
-const validatePostId = (
+export const validatePostId = (
   req: RequestWithPostId,
   res: Response,
   next: NextFunction

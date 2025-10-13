@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import { CommentModel } from "../models/comment.model";
 
+// I've repeated myself
 interface RequestWithPostId extends Request {
   postId?: number;
 }
 
-class CommentController {
+export class CommentController {
   static async handleGetAllForPosts(req: RequestWithPostId, res: Response) {
     try {
       const postId = req.postId as number;
