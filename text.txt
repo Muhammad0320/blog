@@ -1,145 +1,41 @@
-Allahu Akbar, I'm done with this one but I'm filled with doubt about this method it needs thorough refinement, for example if the post table has 30 fields how will I update without wasting bunch of time and keystrokes like this and should I use put instead of patch:  
-` static async update(
-    id: number,
-    data: { title?: string; content?: string }
-  ): Promise<number> {
-    const { title, content } = data;
-    if (!title && !content) {
-      return 0;
-    }
+`
+  Na'am next time when you're trying to teach me something, please just go for the "more modern and robost" approach
+  Now, I have a hunch that the there's something wrong with either the ts config file or my own folder structure - 
+  because when my include was "include: ["src"]". I see this error: src/data/controller/post.controllers.ts:76:26 - error TS2339: Property 'postId' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
 
-    // Something better can be done here!
-    let sql: string;
-    let values: any[];
-    if (title && !content) {
-      sql = `UPDATE posts SET title = ? WHERE id = ?`;
-      values = [title, id];
-    } else if (!title && content) {
-      sql = `UPDATE posts SET content = ? WHERE id = ?`;
-      values = [content, id];
-    } else {
-      sql = `UPDATE posts SET title = ?, content = ? WHERE id = ? `;
-      values = [title, content, id];
-    }
+76       const postId = req.postId as number;
+  But when I did something like this: "include: ["src/**/*"]" I saw a different error instead: TSError: ⨯ Unable to compile TypeScript:
+src/data/middleware/validation.middleware.ts:23:7 - error TS2339: Property 'postId' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
 
-    try {
-      const [result] = await pool.query<ResultSetHeader>(sql, values);
+23   req.postId = id;
 
-      return result.affectedRows;
-    } catch (error) {
-      console.error("Error updating post", error);
-      throw new Error("Could not update post");
-    }
-  }
-` The update method.
+And I thought nodemon restarts the terminal whenever I save any, but not it doesn't do anything unless it's the tsconfig file.
 
-`static async handleUpdatePost(req: RequestWithPostId, res: Response) {
-    try {
-      const postId = req.postId as number;
-      const { title, content } = req.body;
+I really don't know what's happening.
+The summary: I don't think ts compiler saw the changes in my express.d.ts file, because I gives me the same error when I did global declaration, though no error appears in the ide (it doesn't have to)
+so take your time to really see what's happeing
+`
 
-      const affectdRow = await PostModel.update(postId, { title, content });
-      if (affectdRow) {
-        res.status(200).json({ message: "Post successfully updated" });
-      } else {
-        res.status(404).json({ message: "Post not found" });
-      }
-    } catch (error) {
-      console.error("Cannot update post", error);
-      res.status(500).json({ message: "Eror deleting post" });
-    }
-  }
-` The update controller
- 
-`postRoutes.patch("/posts/:id", validatePostId, PostController.handleUpdatePost);
-` The update route 
-
-
-// I'm curious again; I think it should also connect to user model right?
-// But can we safely skip it for later right?
-CREATE TABLE comment (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  content TEXT NOT NULL,
-  author VARCHAR(255),
-  post_id INT NOT NULL, 
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (post_id) REFERENCES post(id) ON DELETE CASCADE
-)
-
-INSERT INTO comment (content, author, post_id) VALUES (?, ?, ?)
-
-//////////////////////////////////
- BismilLah, This is the task you gave me `
-
-..... Imports
-
-// I've repeated myself
-interface RequestWithPostId extends Request {
-  postId?: number;
-}
-
-export class CommentController {
-  static async handleGetAllForPosts(req: RequestWithPostId, res: Response) {
-    try {
-      const postId = req.postId as number;
-
-      const comments = await CommentModel.getAllForPost(postId);
-
-      res.status(200).json(comments);
-    } catch (error) {
-      console.error("Controller error: Error getting all comments", error);
-      throw new Error("Can not get all comments");
-    }
-  }
-
-  static async handleCreate(req: Request, res: Response) {
-    try {
-      const { content, postId, author } = req.body;
-
-      if (!content || !postId || !author) {
-        res
-          .status(400)
-          .json({ message: "content, postId and author field are requireed" });
-      }
-
-      const affectedRow = await CommentModel.create({
-        content,
-        postId,
-        author,
-      });
-      // Is this the right way of checking for a postid not found
-      if (affectedRow < 1) {
-        res.status(404).json({ message: "Post id not found!" });
-      }
-
-      res.json(201).json({ message: "Comment successfully created!" });
-    } catch (error) {
-      console.error("Contoller error: Error creating new comment", error);
-      throw new Error("Cannot create comment");
-    }
-  }
-}
-
-` The commnet controller
 
 `
-import { Router } from "express";
-import { validatePostId } from "./post.route";
-import { CommentController } from "../controller/comment,controller";
-
-const commentRoutes = Router();
-
-// Will I have to extract validatePostId middleware into another function?
-
-commentRoutes.get(
-  "/comments/:id",
-  validatePostId,
-  CommentController.handleGetAllForPosts
-);
-commentRoutes.post("/comments", CommentController.handleCreate);
-
-` The comment Routes. 
-
+It doesn't work still, Is it because of the package.json file? it looks like this: {
+  "name": "blog",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "dev": "nodemon src/app.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    ....
+  },
+  "dependencies": {
+      ....
+  }
+}
 `
-app.use("/api/v1", commentRoutes);
-` The app.ts 

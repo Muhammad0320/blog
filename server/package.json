@@ -7,13 +7,6 @@
     "start": "node dist/app.js",
     "dev": "nodemon src/app.ts"
   },
-  "nodemonConfig": {
-    "ext": "js,json",
-    "ignore": [
-      "dist/**",
-      "node_modules/**"
-    ]
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",

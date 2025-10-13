@@ -1,16 +1,11 @@
 {
   "compilerOptions": {
-    /* --- Core Settings --- */
     "target": "ES2016",
     "module": "commonjs",
     "rootDir": "./src",
     "outDir": "./dist",
-
-    /* --- Interoperability --- */
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-
-    /* --- Strictness & Best Practices --- */
     "strict": true,
     "skipLibCheck": true
   },
