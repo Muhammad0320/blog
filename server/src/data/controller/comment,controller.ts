@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { CommentModel } from "../models/comment.model";
-import { RequestWithPostId } from "../middleware/validatepostid";
+import { RequestWithPostId } from "../middleware/validation.middleware";
 
 export class CommentController {
   static async handleGetAllForPosts(req: RequestWithPostId, res: Response) {

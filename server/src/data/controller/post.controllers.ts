@@ -1,4 +1,4 @@
-import { RequestWithPostId } from "../middleware/validatepostid";
+import { RequestWithPostId } from "../middleware/validation.middleware";
 import { PostModel } from "../models/post.model";
 import { Request, Response } from "express";
 

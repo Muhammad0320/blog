@@ -1,10 +1,8 @@
 import { Router } from "express";
 import { CommentController } from "../controller/comment,controller";
-import { validatePostId } from "../middleware/validatepostid";
+import { validatePostId } from "../middleware/validation.middleware";
 
 const commentRoutes = Router();
-
-// Will I have to extract validatePostId middleware into another function?
 
 commentRoutes.get(
   "/comments/:id",
