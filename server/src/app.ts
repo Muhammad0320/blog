@@ -7,6 +7,7 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 
 app.use("/api/v1", postRoutes);
+app.use("/api/v1", commRoutes);
 
 app.listen(port, () => {
   console.log(`🚀 Server is running a http://localhost:${port}`);
