@@ -1,4 +1,3 @@
-import { RequestWithPostId } from "../middleware/validation.middleware";
 import { PostModel } from "../models/post.model";
 import { Request, Response } from "express";
 
@@ -34,7 +33,7 @@ export class PostController {
     }
   }
 
-  static async handleGetPostById(req: RequestWithPostId, res: Response) {
+  static async handleGetPostById(req: Request, res: Response) {
     try {
       const postId = req.postId as number;
 
@@ -51,7 +50,7 @@ export class PostController {
     }
   }
 
-  static async handleDeletePost(req: RequestWithPostId, res: Response) {
+  static async handleDeletePost(req: Request, res: Response) {
     try {
       const postId = req.postId as number;
 

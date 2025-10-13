@@ -1,8 +1,8 @@
-// This is called declaration merging!
-declare global {
-  namespace Express {
-    export interface Request {
-      postId?: number;
-    }
+// express.d.ts
+import 'express';
+
+declare module 'express-serve-static-core' {
+  interface Request {
+    postId?: number;
   }
 }
