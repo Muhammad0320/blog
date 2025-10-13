@@ -2,13 +2,13 @@ import { Router } from "express";
 import { CommentController } from "../controller/comment,controller";
 import { validatePostId } from "../middleware/validation.middleware";
 
-const commentRoutes = Router();
+const commentRouter = Router();
 
-commentRoutes.get(
+commentRouter.get(
   "/comments/:id",
   validatePostId,
   CommentController.handleGetAllForPosts
 );
-commentRoutes.post("/comments", CommentController.handleCreate);
+commentRouter.post("/comments", CommentController.handleCreate);
 
-export default commentRoutes;
+export default commentRouter;

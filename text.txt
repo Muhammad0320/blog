@@ -66,5 +66,80 @@ CREATE TABLE comment (
   FOREIGN KEY (post_id) REFERENCES post(id) ON DELETE CASCADE
 )
 
-SELECT * FROM comments
-WHERE post_id = ?
+INSERT INTO comment (content, author, post_id) VALUES (?, ?, ?)
+
+//////////////////////////////////
+ BismilLah, This is the task you gave me `
+
+..... Imports
+
+// I've repeated myself
+interface RequestWithPostId extends Request {
+  postId?: number;
+}
+
+export class CommentController {
+  static async handleGetAllForPosts(req: RequestWithPostId, res: Response) {
+    try {
+      const postId = req.postId as number;
+
+      const comments = await CommentModel.getAllForPost(postId);
+
+      res.status(200).json(comments);
+    } catch (error) {
+      console.error("Controller error: Error getting all comments", error);
+      throw new Error("Can not get all comments");
+    }
+  }
+
+  static async handleCreate(req: Request, res: Response) {
+    try {
+      const { content, postId, author } = req.body;
+
+      if (!content || !postId || !author) {
+        res
+          .status(400)
+          .json({ message: "content, postId and author field are requireed" });
+      }
+
+      const affectedRow = await CommentModel.create({
+        content,
+        postId,
+        author,
+      });
+      // Is this the right way of checking for a postid not found
+      if (affectedRow < 1) {
+        res.status(404).json({ message: "Post id not found!" });
+      }
+
+      res.json(201).json({ message: "Comment successfully created!" });
+    } catch (error) {
+      console.error("Contoller error: Error creating new comment", error);
+      throw new Error("Cannot create comment");
+    }
+  }
+}
+
+` The commnet controller
+
+`
+import { Router } from "express";
+import { validatePostId } from "./post.route";
+import { CommentController } from "../controller/comment,controller";
+
+const commentRoutes = Router();
+
+// Will I have to extract validatePostId middleware into another function?
+
+commentRoutes.get(
+  "/comments/:id",
+  validatePostId,
+  CommentController.handleGetAllForPosts
+);
+commentRoutes.post("/comments", CommentController.handleCreate);
+
+` The comment Routes. 
+
+`
+app.use("/api/v1", commentRoutes);
+` The app.ts 

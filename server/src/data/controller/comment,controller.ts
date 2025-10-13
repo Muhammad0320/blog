@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 import { CommentModel } from "../models/comment.model";
-import { RequestWithPostId } from "../middleware/validation.middleware";
 
 export class CommentController {
-  static async handleGetAllForPosts(req: RequestWithPostId, res: Response) {
+  static async handleGetAllForPosts(req: Request, res: Response) {
     try {
       const postId = req.postId as number;
 
@@ -16,11 +15,11 @@ export class CommentController {
     }
   }
 
-  static async handleCreate(req: RequestWithPostId, res: Response) {
+  static async handleCreate(req: Request, res: Response) {
     try {
       const postId = req.postId as number;
       const { content, author } = req.body;
-
+      
       if (!content) {
         res.status(400).json({ message: "The 'content' field is required " });
       }
