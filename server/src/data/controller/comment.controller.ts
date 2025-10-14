@@ -84,7 +84,7 @@ export class CommentController {
         return;
       }
 
-      const affectedRow = await CommentModel.update({ id, content });
+      const affectedRow = await CommentModel.update(id, { content });
 
       if (affectedRow) {
         res.status(200).json({ message: "comment successfully updated" });

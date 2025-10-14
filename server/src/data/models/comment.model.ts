@@ -65,13 +65,10 @@ export class CommentModel {
     }
   }
 
-  static async update({
-    content,
-    id,
-  }: {
-    id: number;
-    content: string;
-  }): Promise<Number> {
+  static async update(
+    id: number,
+    { content }: { content: string }
+  ): Promise<Number> {
     const sql = `UPDATE comments SET content = ? WHERE id = ?`;
 
     try {
