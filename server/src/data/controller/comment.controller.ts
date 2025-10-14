@@ -56,5 +56,21 @@ export class CommentController {
     }
   }
 
-  static async handleDelete(req: Request, res: Response) {}
+  static async handleDelete(req: Request, res: Response) {
+    try {
+      const id = req.id as number;
+
+      const affectedRow = await CommentModel.delete(id);
+      if (affectedRow) {
+        res.status(204).send();
+        return;
+      }
+
+      res.status(404).json({ message: "comment not found" });
+    } catch (error) {
+      console.error("Cannot delete comment", error);
+
+      throw new Error("Error deleting comment");
+    }
+  }
 }

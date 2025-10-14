@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { validatePostId } from "../middleware/validation.middleware";
+import { validateId } from "../middleware/validation.middleware";
 import { PostController } from "../controller/post.controller";
 
 const postRoutes = Router();
@@ -7,12 +7,8 @@ const postRoutes = Router();
 postRoutes.get("/posts", PostController.handleGetAllPosts);
 postRoutes.post("/posts", PostController.handleCreatePost);
 
-postRoutes.get("/posts/:id", validatePostId, PostController.handleGetPostById);
-postRoutes.patch("/posts/:id", validatePostId, PostController.handleUpdatePost);
-postRoutes.delete(
-  "/posts/:id",
-  validatePostId,
-  PostController.handleDeletePost
-);
+postRoutes.get("/posts/:id", validateId, PostController.handleGetPostById);
+postRoutes.patch("/posts/:id", validateId, PostController.handleUpdatePost);
+postRoutes.delete("/posts/:id", validateId, PostController.handleDeletePost);
 
 export default postRoutes;

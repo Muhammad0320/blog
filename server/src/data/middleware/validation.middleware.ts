@@ -3,11 +3,7 @@ import { Response, NextFunction, Request } from "express";
 /**
  * Middleware to validate the post ID from the URL parameters.
  */
-export const validatePostId = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const validateId = (req: Request, res: Response, next: NextFunction) => {
   // We'll use req.params.postId now to be more descriptive
   const { id: postId } = req.params;
   console.log(req.params);
