@@ -35,7 +35,6 @@ export class PostController {
 
   static async handleGetPostById(req: Request, res: Response) {
     try {
-      console.log("---- Do you catch changes -----------------");
       const postId = req.postId as number;
 
       const post = await PostModel.getById(postId);
@@ -53,8 +52,6 @@ export class PostController {
 
   static async handleDeletePost(req: Request, res: Response) {
     try {
-      console.log("---- Do you catch changes -----------------");
-
       const postId = req.postId as number;
 
       const affectedRow = await PostModel.delete(postId);
@@ -71,8 +68,6 @@ export class PostController {
 
   static async handleUpdatePost(req: Request, res: Response) {
     try {
-      console.log("---- Do you catch changes -----------------");
-
       const postId = req.postId as number;
       const { title, content } = req.body;
 

@@ -29,6 +29,7 @@ export class CommentModel {
   }
 
   static async create(data: NewCommentData): Promise<number> {
+    console.log("--------------- Do you reach here ? -----------------");
     const { content, postId, author } = data;
 
     const sql = `

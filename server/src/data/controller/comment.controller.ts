@@ -22,6 +22,7 @@ export class CommentController {
 
       if (!content) {
         res.status(400).json({ message: "The 'content' field is required " });
+        return;
       }
 
       const newCommentId = await CommentModel.create({
@@ -30,7 +31,7 @@ export class CommentController {
         author,
       });
 
-      res.json(201).json({
+      res.status(201).json({
         message: "Comment successfully created!",
         commentId: newCommentId,
       });
@@ -44,9 +45,10 @@ export class CommentController {
         typeof error.message === "string"
       ) {
         if (error.message?.includes("post does not exist")) {
-          return res.status(404).json({
+          res.status(404).json({
             message: "Cannot create comment for a post that does not exist",
           });
+          return;
         }
       }
 
