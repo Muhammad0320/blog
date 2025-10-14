@@ -14,14 +14,10 @@ export const validatePostId = (
   const id = parseInt(postId, 10);
 
   if (isNaN(id)) {
-    return res
-      .status(400)
-      .json({ message: "Invalid post ID. Must be a number." });
+    return res.status(400).json({ message: "Invalid ID. Must be a number." });
   }
 
-  console.log("---- Do you catch changes -----------------");
+  req.id = id;
 
-  req.postId = id;
-  console.log(req.postId);
   next();
 };

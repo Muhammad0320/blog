@@ -4,7 +4,7 @@ import { CommentModel } from "../models/comment.model";
 export class CommentController {
   static async handleGetAllForPosts(req: Request, res: Response) {
     try {
-      const postId = req.postId as number;
+      const postId = req.id as number;
 
       const comments = await CommentModel.getAllForPost(postId);
 
@@ -17,7 +17,7 @@ export class CommentController {
 
   static async handleCreate(req: Request, res: Response) {
     try {
-      const postId = req.postId as number;
+      const postId = req.id as number;
       const { content, author } = req.body;
 
       if (!content) {
@@ -55,4 +55,6 @@ export class CommentController {
       res.status(500).json({ mesage: "Error creating comment" });
     }
   }
+
+  static async handleDelete(req: Request, res: Response) {}
 }

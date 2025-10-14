@@ -29,7 +29,6 @@ export class CommentModel {
   }
 
   static async create(data: NewCommentData): Promise<number> {
-    console.log("--------------- Do you reach here ? -----------------");
     const { content, postId, author } = data;
 
     const sql = `
@@ -42,7 +41,6 @@ export class CommentModel {
 
       return result.insertId;
     } catch (error: unknown) {
-      /* I could have added a better type here; something better can be done, I should have left if but get error saying the error is of type unknow. */
       console.error("Error Creating comment: ", error);
 
       if (error && typeof error === "object" && "code" in error) {
@@ -52,6 +50,18 @@ export class CommentModel {
           );
       }
       throw new Error("Could not create comment");
+    }
+  }
+
+  static async delete(id: number): Promise<Number> {
+    const sql = `DELETE FROM comments WHERE id = ? `;
+
+    try {
+      const [results] = await pool.query<ResultSetHeader>(sql, [id]);
+      return results.affectedRows;
+    } catch (error) {
+      console.error("Error dleting comment", error);
+      throw new Error("Could not delete comment");
     }
   }
 }
