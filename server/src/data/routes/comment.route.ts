@@ -5,10 +5,14 @@ import { CommentController } from "../controller/comment.controller";
 const commentRouter = Router();
 
 commentRouter.get(
-  "/comments/:id",
+  "/posts/:id/comments",
   validatePostId,
   CommentController.handleGetAllForPosts
 );
-commentRouter.post("/comments", CommentController.handleCreate);
+commentRouter.post(
+  "/posts/:id/comments",
+  validatePostId,
+  CommentController.handleCreate
+);
 
 export default commentRouter;

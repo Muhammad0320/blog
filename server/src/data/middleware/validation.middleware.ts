@@ -9,7 +9,8 @@ export const validatePostId = (
   next: NextFunction
 ) => {
   // We'll use req.params.postId now to be more descriptive
-  const { postId } = req.params;
+  const { id: postId } = req.params;
+  console.log(req.params);
   const id = parseInt(postId, 10);
 
   if (isNaN(id)) {
@@ -21,5 +22,6 @@ export const validatePostId = (
   console.log("---- Do you catch changes -----------------");
 
   req.postId = id;
+  console.log(req.postId);
   next();
 };
