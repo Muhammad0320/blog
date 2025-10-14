@@ -35,7 +35,7 @@ export class PostController {
 
   static async handleGetPostById(req: Request, res: Response) {
     try {
-      const postId = req.id as number;
+      const postId = req.postId as number;
 
       const post = await PostModel.getById(postId);
 
@@ -52,7 +52,7 @@ export class PostController {
 
   static async handleDeletePost(req: Request, res: Response) {
     try {
-      const postId = req.id as number;
+      const postId = req.postId as number;
 
       const affectedRow = await PostModel.delete(postId);
       if (affectedRow) {
@@ -68,7 +68,7 @@ export class PostController {
 
   static async handleUpdatePost(req: Request, res: Response) {
     try {
-      const postId = req.id as number;
+      const postId = req.postId as number;
       const { title, content } = req.body;
 
       const affectdRow = await PostModel.update(postId, { title, content });

@@ -1,23 +1,23 @@
 import { Router } from "express";
-import { validateId } from "../middleware/validation.middleware";
+import { validateCommentId } from "../middleware/validation.middleware";
 import { CommentController } from "../controller/comment.controller";
 
 const commentRouter = Router();
 
 commentRouter.get(
   "/posts/:id/comments",
-  validateId,
+  validateCommentId,
   CommentController.handleGetAllForPosts
 );
 commentRouter.post(
   "/posts/:id/comments",
-  validateId,
+  validateCommentId,
   CommentController.handleCreate
 );
 
 commentRouter.delete(
   "/comments/:id",
-  validateId,
+  validateCommentId,
   CommentController.handleDelete
 );
 

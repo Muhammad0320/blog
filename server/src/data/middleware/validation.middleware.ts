@@ -1,19 +1,42 @@
-import { Response, NextFunction, Request } from "express";
+import { Request, Response, NextFunction } from "express";
 
-/**
- * Middleware to validate the post ID from the URL parameters.
- */
-export const validateId = (req: Request, res: Response, next: NextFunction) => {
-  // We'll use req.params.postId now to be more descriptive
-  const { id: postId } = req.params;
-  console.log(req.params);
+export const validatePostId = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { postId } = req.params;
   const id = parseInt(postId, 10);
 
   if (isNaN(id)) {
-    return res.status(400).json({ message: "Invalid ID. Must be a number." });
+    return res
+      .status(400)
+      .json({ message: "Invalid post ID. Must be a number." });
   }
 
-  req.id = id;
+  req.postId = id;
+  next();
+};
 
+/**
+ * NEW: Middleware to validate the comment ID from the URL parameters.
+ */
+export const validateCommentId = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  // We look for 'commentId' in the URL
+  const { commentId } = req.params;
+  const id = parseInt(commentId, 10);
+
+  if (isNaN(id)) {
+    return res
+      .status(400)
+      .json({ message: "Invalid comment ID. Must be a number." });
+  }
+
+  // We attach it to the request as 'req.commentId'
+  req.commentId = id;
   next();
 };
