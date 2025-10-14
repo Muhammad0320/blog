@@ -73,4 +73,27 @@ export class CommentController {
       throw new Error("Error deleting comment");
     }
   }
+
+  static async handleUpdate(req: Request, res: Response) {
+    try {
+      const id = req.commentId as number;
+      const { content } = req.body;
+
+      if (!content) {
+        res.status(400).json({ message: "The 'content' field is required " });
+        return;
+      }
+
+      const affectedRow = await CommentModel.update({ id, content });
+
+      if (affectedRow) {
+        res.status(200).json({ message: "comment successfully updated" });
+      } else {
+        res.status(404).json({ message: "comment not found" });
+      }
+    } catch (error) {
+      console.error("Could not update comment", error);
+      throw new Error("Error updating comment");
+    }
+  }
 }

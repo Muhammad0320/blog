@@ -7,10 +7,18 @@ const postRoutes = Router();
 postRoutes.get("/posts", PostController.handleGetAllPosts);
 postRoutes.post("/posts", PostController.handleCreatePost);
 
-postRoutes.get("/posts/:id", validatePostId, PostController.handleGetPostById);
-postRoutes.patch("/posts/:id", validatePostId, PostController.handleUpdatePost);
+postRoutes.get(
+  "/posts/:postId",
+  validatePostId,
+  PostController.handleGetPostById
+);
+postRoutes.patch(
+  "/posts/:postId",
+  validatePostId,
+  PostController.handleUpdatePost
+);
 postRoutes.delete(
-  "/posts/:id",
+  "/posts/:postId",
   validatePostId,
   PostController.handleDeletePost
 );

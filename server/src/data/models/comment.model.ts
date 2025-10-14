@@ -64,4 +64,22 @@ export class CommentModel {
       throw new Error("Could not delete comment");
     }
   }
+
+  static async update({
+    content,
+    id,
+  }: {
+    id: number;
+    content: string;
+  }): Promise<Number> {
+    const sql = `UPDATE comments SET content = ? WHERE id = ?`;
+
+    try {
+      const [results] = await pool.query<ResultSetHeader>(sql, [content, id]);
+      return results.affectedRows;
+    } catch (error) {
+      console.error("Error updating post", error);
+      throw new Error("Cannot update post");
+    }
+  }
 }

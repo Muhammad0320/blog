@@ -5,20 +5,26 @@ import { CommentController } from "../controller/comment.controller";
 const commentRouter = Router();
 
 commentRouter.get(
-  "/posts/:id/comments",
+  "/posts/:postId/comments",
   validateCommentId,
   CommentController.handleGetAllForPosts
 );
 commentRouter.post(
-  "/posts/:id/comments",
+  "/posts/:postId/comments",
   validateCommentId,
   CommentController.handleCreate
 );
 
 commentRouter.delete(
-  "/comments/:id",
+  "/comments/:commentId",
   validateCommentId,
   CommentController.handleDelete
+);
+
+commentRouter.patch(
+  "/comments/:commentId",
+  validateCommentId,
+  CommentController.handleUpdate
 );
 
 export default commentRouter;
