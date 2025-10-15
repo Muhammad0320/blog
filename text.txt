@@ -18,24 +18,71 @@ so take your time to really see what's happeing
 
 
 `
-It doesn't work still, Is it because of the package.json file? it looks like this: {
-  "name": "blog",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "build": "tsc",
-    "start": "node dist/app.js",
-    "dev": "nodemon src/app.ts"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "devDependencies": {
-    ....
-  },
-  "dependencies": {
-      ....
-  }
+  Allihamdullilah, That tiny --files flag, just fixed it! why have been hiding the solution to the problem since? 
+
+  But when I ran this: /api/v1/posts/1/comments, something interesting happens, the response was 
+`
+
+`
+  Allihamdullilah, here they are, once again: 
+      static async update({
+    content,
+    id,
+  }: {
+    id: number;
+    content: string;
+  }): Promise<Number> {
+    const sql = `UPDATE comments SET content = ? WHERE id = ?`;
+
+    try {
+      const [results] = await pool.query<ResultSetHeader>(sql, [content, id]);
+      return results.affectedRows;
+    } catch (error) {
+      console.error("Error updating post", error);
+      throw new Error("Cannot update post");
+    }
+  } // The model
+
+   static async handleUpdate(req: Request, res: Response) {
+    try {
+      const id = req.commentId as number;
+      const { content } = req.body;
+
+      if (!content) {
+        res.status(400).json({ message: "The 'content' field is required " });
+        return;
+      }
+
+      const affectedRow = await CommentModel.update({ id, content });
+
+      if (affectedRow) {
+        res.status(200).json({ message: "comment successfully updated" });
+      } else {
+        res.status(404).json({ message: "comment not found" });
+      }
+    } catch (error) {
+      console.error("Could not update comment", error);
+      throw new Error("Error updating comment");
+    }
+  } // The controller 
+
+ commentRouter.patch(
+  "/comments/:commentId",
+  validateCommentId,
+  CommentController.handleUpdate
+); // The router. 
+
+Allihamdullilah, another model is done!
+`
+
+
+`
+interface User extends RowDataPacket {
+    id: number
+    username: string
+    email: string,
+    password: string,
+    created_at: Date
 }
+Again be very critical with it. 
 `
