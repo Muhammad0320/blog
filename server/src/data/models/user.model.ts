@@ -1,8 +1,8 @@
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import pool from "../db";
 import { z } from "zod";
-import bcrypt from "bcrypt";
 import { userCreateSchema } from "../../lib/validators";
+import { Password } from "../../lib/auth";
 
 export interface User extends RowDataPacket {
   id: number;
@@ -34,7 +34,7 @@ export class UserModel {
     }
 
     // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await Password.hash(password);
 
     const insertSql = `INSERT INTO users (username, email, password) VALUES (?, ?, ?)`;
     const values = [username, email, hashedPassword];
