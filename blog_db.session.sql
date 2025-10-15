@@ -13,3 +13,11 @@ CREATE TABLE comments (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
 );
+
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY, 
+  username VARCHAR(255) NOT NULL UNIQUE, /* Is this 'unique' a correct syntax */
+  email VARCHAR(255) NOT NULL UNIQUE, 
+  password VARCHAR(255) NOT NULL, 
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
