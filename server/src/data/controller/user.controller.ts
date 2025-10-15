@@ -1,22 +1,20 @@
 import { Request, Response } from "express";
 import { UserModel } from "../models/user.model";
-import { createUserSchema } from "../../lib/validators";
+import { userCreateSchema } from "../../lib/validators";
 import z, { ZodError } from "zod";
 
 export class UserController {
   static async handleCreate(req: Request, res: Response) {
     try {
-      const userData = createUserSchema.parse(req.body);
+      const userData = userCreateSchema.parse(req.body);
       const userId = await UserModel.create(userData);
       res.status(201).json({ userId, message: "User successfully created" });
     } catch (error) {
       if (error instanceof ZodError) {
-        res
-          .status(400)
-          .json({
-            message: "Invalid input",
-            errors: z.treeifyError(error).errors,
-          });
+        res.status(400).json({
+          message: "Invalid input",
+          errors: z.treeifyError(error).errors,
+        });
         return;
       }
 

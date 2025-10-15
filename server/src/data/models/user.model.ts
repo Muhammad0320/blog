@@ -1,5 +1,8 @@
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import pool from "../db";
+import { z } from "zod";
+import bcrypt from "bcrypt";
+import { userCreateSchema } from "../../lib/validators";
 
 export interface User extends RowDataPacket {
   id: number;
@@ -9,13 +12,9 @@ export interface User extends RowDataPacket {
   created_at: Date;
 }
 
-interface UserData {
-  username: string;
-  email: string;
-  password: string;
-}
-
 export type PublicUser = Omit<User, "password">;
+
+type UserData = z.infer<typeof userCreateSchema>;
 
 export class UserModel {
   static async create({
@@ -23,13 +22,24 @@ export class UserModel {
     email,
     password,
   }: UserData): Promise<number> {
-    // Unarguably the code here should be the longest, I also have another question; I think it will be good to have the user's first and lastname! and what i'm doing with the password here is egregious because it has not been encrypted, I'll probably need a library to hash it
-    // I'll also have to check if email or username are already chosen
-    const sql = `INSERT INTO users (username, email, password) VALUES (?, ?, ?)`;
+    // Check for duplicate username/email
+    const checkSql = `SELECT id FROM users WHERE username = ? OR email = ?`;
+    const [existingUser] = await pool.query<User[]>(checkSql, [
+      username,
+      email,
+    ]);
 
+    if (existingUser.length > 0) {
+      throw new Error("Username or email already exists");
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const insertSql = `INSERT INTO users (username, email, password) VALUES (?, ?, ?)`;
+    const values = [username, email, hashedPassword];
     try {
-      const values = [username, email, password];
-      const [result] = await pool.query<ResultSetHeader>(sql, values);
+      const [result] = await pool.query<ResultSetHeader>(insertSql, values);
 
       return result.insertId;
     } catch (error) {
