@@ -72,6 +72,19 @@ export class UserController {
 
       console.error("Controller error: Could not login user", error);
       res.status(500).json({ message: "Error logging in user" });
+      return;
     }
+  }
+
+  static async handleLogout(req: Request, res: Response) {
+    req.session.destroy((err) => {
+      if (err) {
+        res.status(500).json({ message: "Could not logout, Please try again" });
+      }
+
+      res.clearCookie("connect.sid");
+      res.status(200).json({ message: "Logout successful" });
+      return;
+    });
   }
 }
