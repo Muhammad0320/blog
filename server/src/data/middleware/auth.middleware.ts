@@ -17,14 +17,19 @@ export const isAuthenicated = async (
   });
 };
 
-export const isPostOwner = async (
+export const canModifyPost = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const loggedUserId = req.session.userId as number;
     const postId = req.postId as number;
+    const loggedUserId = req.session.userId as number;
+    const userRole = req.session.role;
+
+    if (userRole === "admin") {
+      return next();
+    }
 
     const sql = `SELECT user_id FROM posts WHERE id = ?`;
     const [rows] = await pool.query<Post[]>(sql, [postId]);
@@ -34,7 +39,6 @@ export const isPostOwner = async (
     }
 
     const authorUserId = rows[0].userId;
-
     if (authorUserId !== loggedUserId) {
       return res.status(403).json({
         message: "Forbidden: You're not permitted to perform this action!",

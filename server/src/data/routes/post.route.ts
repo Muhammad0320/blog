@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { validatePostId } from "../middleware/validation.middleware";
 import { PostController } from "../controller/post.controller";
-import { isAuthenicated, isPostOwner } from "../middleware/auth.middleware";
+import { isAuthenicated, canModifyPost } from "../middleware/auth.middleware";
 
 const postRoutes = Router();
 
@@ -17,14 +17,14 @@ postRoutes.patch(
   "/posts/:postId",
   validatePostId,
   isAuthenicated,
-  isPostOwner,
+  canModifyPost,
   PostController.handleUpdatePost
 );
 postRoutes.delete(
   "/posts/:postId",
   validatePostId,
   isAuthenicated,
-  isPostOwner,
+  canModifyPost,
   PostController.handleDeletePost
 );
 

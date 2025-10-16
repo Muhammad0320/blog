@@ -1,8 +1,8 @@
+import z, { ZodError } from "zod";
+import { Password } from "../../lib/auth";
 import { Request, Response } from "express";
 import { PublicUser, UserModel } from "../models/user.model";
 import { userCreateSchema, userLoginSchema } from "../../lib/validators";
-import z, { ZodError } from "zod";
-import { Password } from "../../lib/auth";
 
 export class UserController {
   static async handleCreate(req: Request, res: Response) {
@@ -52,6 +52,7 @@ export class UserController {
 
       // ---- CREATE THE SESSION ----
       req.session.userId = user.id;
+      req.session.role = user.role;
 
       const publicUser: PublicUser = {
         id: user.id,
