@@ -10,6 +10,7 @@ export interface User extends RowDataPacket {
   email: string;
   password: string; // I think it will be in bytes or hex when hashes
   created_at: Date;
+  role: "user" | "admin";
 }
 
 export type PublicUser = Omit<User, "password">;

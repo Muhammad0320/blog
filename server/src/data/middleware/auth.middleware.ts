@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import pool from "../db";
-import { User } from "../models/user.model";
 import { Post } from "../models/post.model";
 
 export const isAuthenicated = async (
@@ -37,11 +36,9 @@ export const isPostOwner = async (
     const authorUserId = rows[0].userId;
 
     if (authorUserId !== loggedUserId) {
-      return res
-        .status(403)
-        .json({
-          message: "Forbidden: You're not permitted to perform this action!",
-        });
+      return res.status(403).json({
+        message: "Forbidden: You're not permitted to perform this action!",
+      });
     }
 
     return next();
