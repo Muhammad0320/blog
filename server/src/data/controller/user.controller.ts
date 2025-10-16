@@ -41,18 +41,15 @@ export class UserController {
 
       const existingUser = await UserModel.findByEmail(email);
       if (!existingUser) {
-        // I think it's error 401 / 403
         res.status(401).json({ message: "Invalid email or password" });
         return;
       }
 
-      if (!Password.compare(password, existingUser.password)) {
-        // I think it's error 401 / 403, Also
+      if (!(await Password.compare(password, existingUser.password))) {
         res.status(401).json({ message: "Invalid email or password" });
         return;
       }
 
-      // I should add login for adding session cookie stuff here, probably adding a new prop to the Request interface in the express.d.ts file, so that it will be easy for me to check if a specific user is logged in or I can even add a middleware to do that
       res.status(200).json({ message: "Login Successful", data: existingUser });
     } catch (error) {
       if (error instanceof ZodError) {
