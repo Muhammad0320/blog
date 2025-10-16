@@ -17,6 +17,12 @@ export type PublicUser = Omit<User, "password">;
 
 type UserData = z.infer<typeof userCreateSchema>;
 
+export type UserProfileInfo = {
+  id: number;
+  username: string;
+  created_at: Date;
+};
+
 export class UserModel {
   static async create({
     username,
@@ -51,7 +57,6 @@ export class UserModel {
 
   static async findByEmail(email: string): Promise<User | null> {
     const sql = `SELECT * FROM users WHERE email = ?`;
-
     try {
       const [rows] = await pool.query<User[]>(sql, [email]);
 
@@ -59,6 +64,24 @@ export class UserModel {
     } catch (error) {
       console.error("DB Error: could not find user with such email", email);
       throw new Error("Error finding user");
+    }
+  }
+
+  static async findPublicProfileById(
+    id: number
+  ): Promise<UserProfileInfo | null> {
+    const sql = `SELECT id, username, created_at FROM users WHERE id = ?`;
+
+    try {
+      const [rows] = await pool.query<(UserProfileInfo & RowDataPacket)[]>(
+        sql,
+        [id]
+      );
+
+      return rows[0] || null;
+    } catch (error) {
+      console.error("DB error: could not find user with such id ", error);
+      throw new Error("Error finding user profile");
     }
   }
 }
