@@ -47,4 +47,17 @@ export class UserModel {
       throw new Error("Cannot create user");
     }
   }
+
+  static async findByEmail(email: string): Promise<User | null> {
+    const sql = `SELECT * FROM users WHERE email = ?`;
+
+    try {
+      const [rows] = await pool.query<User[]>(sql, [email]);
+
+      return rows[0] || null;
+    } catch (error) {
+      console.error("DB Error: could not find user with such email", email);
+      throw new Error("Error finding user");
+    }
+  }
 }
