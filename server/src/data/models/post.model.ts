@@ -1,11 +1,12 @@
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import pool from "../db";
 
-interface Post extends RowDataPacket {
+export interface Post extends RowDataPacket {
   id: number;
   title: string;
   content: string;
   created_at?: Date;
+  userId: number;
 }
 
 interface NewPostData {
