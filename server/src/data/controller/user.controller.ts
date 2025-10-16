@@ -88,4 +88,20 @@ export class UserController {
       return;
     });
   }
+
+  static async handlePublicProfile(req: Request, res: Response) {
+    try {
+      const userId = req.userId as number;
+
+      const userProfile = await UserModel.findPublicProfileById(userId);
+      if (!userProfile) {
+        return res.status(404).json({ message: "Profile not found" });
+      }
+
+      res.status(200).json(userProfile);
+    } catch (error) {
+      console.error("Contoller error: Could not get public profile");
+      res.status(500).json({ message: "Error getting public profile" });
+    }
+  }
 }

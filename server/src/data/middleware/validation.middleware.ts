@@ -40,3 +40,23 @@ export const validateCommentId = (
   req.commentId = id;
   next();
 };
+
+export const validateUserId = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  // We look for 'commentId' in the URL
+  const { userId } = req.params;
+  const id = parseInt(userId, 10);
+
+  if (isNaN(id)) {
+    return res
+      .status(400)
+      .json({ message: "Invalid user ID. Must be a number." });
+  }
+
+  // We attach it to the request as 'req.userId'
+  req.userId = id;
+  next();
+};
