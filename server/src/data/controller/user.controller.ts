@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { UserModel } from "../models/user.model";
+import { PublicUser, UserModel } from "../models/user.model";
 import { userCreateSchema, userLoginSchema } from "../../lib/validators";
 import z, { ZodError } from "zod";
 import { Password } from "../../lib/auth";
@@ -39,18 +39,28 @@ export class UserController {
     try {
       const { email, password } = userLoginSchema.parse(req.body);
 
-      const existingUser = await UserModel.findByEmail(email);
-      if (!existingUser) {
-        res.status(401).json({ message: "Invalid email or password" });
+      const user = await UserModel.findByEmail(email);
+      if (!user) {
+        res.status(401).json({ message: "Invalid credentials" });
         return;
       }
 
-      if (!(await Password.compare(password, existingUser.password))) {
-        res.status(401).json({ message: "Invalid email or password" });
+      if (!(await Password.compare(password, user.password))) {
+        res.status(401).json({ message: "Invalid credentials" });
         return;
       }
 
-      res.status(200).json({ message: "Login Successful", data: existingUser });
+      // ---- CREATE THE SESSION ----
+      req.session.userId = user.id;
+
+      const publicUser: PublicUser = {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        created_at: user.created_at,
+      };
+
+      res.status(200).json({ message: "Login Successful", user: publicUser });
     } catch (error) {
       if (error instanceof ZodError) {
         res.status(400).json({
