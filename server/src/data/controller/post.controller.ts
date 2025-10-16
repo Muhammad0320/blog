@@ -21,11 +21,13 @@ export class PostController {
     try {
       const { title, content } = req.body;
 
+      const userId = req.session.userId as number;
+
       if (!title || !content) {
         res.status(400).json({ message: "Title and Content are required" });
       }
 
-      const postId = await PostModel.create({ title, content });
+      const postId = await PostModel.create({ title, content, userId });
       res.status(201).json({ message: "Post created successfully", postId });
     } catch (error) {
       console.error("Controller Error: could not create post", error);

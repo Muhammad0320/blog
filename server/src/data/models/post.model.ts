@@ -1,4 +1,4 @@
-import { OkPacket, ResultSetHeader, RowDataPacket } from "mysql2";
+import { ResultSetHeader, RowDataPacket } from "mysql2";
 import pool from "../db";
 
 interface Post extends RowDataPacket {
@@ -6,6 +6,12 @@ interface Post extends RowDataPacket {
   title: string;
   content: string;
   created_at?: Date;
+}
+
+interface NewPostData {
+  title: string;
+  content: string;
+  userId: number;
 }
 
 // A class to group our post-related functions
@@ -33,14 +39,11 @@ export class PostModel {
    * @param newPost An object containing the title and content for the new post.
    * @returns A promise that resolves to the ID of the newly created post.
    */
-  static async create(newPost: {
-    title: string;
-    content: string;
-  }): Promise<number> {
-    const { title, content } = newPost;
+  static async create(newPost: NewPostData): Promise<number> {
+    const { title, content, userId } = newPost;
 
-    const sql = `INSERT INTO posts (title, content) VALUES (?, ?)`;
-    const values = [title, content];
+    const sql = `INSERT INTO posts (title, content, userId) VALUES (?, ?, ?)`;
+    const values = [title, content, userId];
 
     try {
       const [result] = await pool.query<ResultSetHeader>(sql, values);
