@@ -15,7 +15,7 @@ export interface User extends RowDataPacket {
 
 export type PublicUser = Omit<User, "password">;
 
-type UserData = z.infer<typeof userCreateSchema>;
+export type UserData = z.infer<typeof userCreateSchema>;
 
 export type UserProfileInfo = {
   id: number;

@@ -3,6 +3,7 @@ import express from "express";
 import userRouter from "./user.route";
 import pool from "../db";
 import session from "express-session";
+import { UserData } from "../models/user.model";
 
 const app = express();
 app.use(express.json());
@@ -16,6 +17,10 @@ app.use(
 );
 
 app.use("/api/v1", userRouter);
+const createUser = async (userData: UserData) => {
+  const res = await request(app).post("/api/v1/users").send(userData);
+  return res;
+};
 
 describe("User API Endpoints", () => {
   beforeEach(async () => {
@@ -55,9 +60,8 @@ describe("User API Endpoints", () => {
       password: "password123",
     };
 
-    await request(app).post("/api/v1/users").send(firstUser);
-
-    const res = await request(app).post("/api/v1/users").send(secondUser);
+    await createUser(firstUser);
+    const res = await createUser(secondUser);
 
     expect(res.status).toBe(409);
     expect(res.body.message).toBe("Username or email already exists.");
@@ -70,8 +74,7 @@ describe("User API Endpoints", () => {
       password: "123",
     };
 
-    const res = await request(app).post("/api/v1/users").send(invalidUser);
-
+    const res = await createUser(invalidUser);
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty("errors");
     expect(res.body.errors).toHaveProperty("password");
@@ -85,7 +88,7 @@ describe("User API Endpoints", () => {
       password: "password123",
     };
 
-    await request(app).post("/api/v1/users").send(newUserData);
+    await createUser(newUserData);
 
     const res = await request(app).post("/api/v1/login").send({
       email: newUserData.email,
@@ -106,8 +109,7 @@ describe("User API Endpoints", () => {
       password: "password123",
     };
 
-    await request(app).post("/api/v1/users").send(newUserData);
-
+    await createUser(newUserData);
     const res = await request(app).post("/api/v1/login").send({
       email: newUserData.email,
       password: "password456",
@@ -125,8 +127,7 @@ describe("User API Endpoints", () => {
       password: "password123",
     };
 
-    await request(app).post("/api/v1/users").send(newUserData);
-
+    await createUser(newUserData);
     const res = await request(app).post("/api/v1/login").send({
       email: "myemail.com",
       password: "password123",
