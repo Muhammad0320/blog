@@ -22,6 +22,11 @@ const createUser = async (userData: UserData) => {
   return res;
 };
 
+const loginUser = async (loginData: { email: string; password: string }) => {
+  const res = await request(app).post("/api/v1/login").send(loginData);
+  return res;
+};
+
 describe("User API Endpoints", () => {
   beforeEach(async () => {
     await pool.query("DELETE FROM users");
@@ -81,7 +86,6 @@ describe("User API Endpoints", () => {
   });
 
   it("should successfully login user with valid credentials ans return a session cookie", async () => {
-    // I've repeated the exact same thing multitple times to simulate succesful signup
     const newUserData = {
       username: "testuser",
       email: "login@test.com",
@@ -89,8 +93,7 @@ describe("User API Endpoints", () => {
     };
 
     await createUser(newUserData);
-
-    const res = await request(app).post("/api/v1/login").send({
+    const res = await loginUser({
       email: newUserData.email,
       password: newUserData.password,
     });
@@ -110,7 +113,7 @@ describe("User API Endpoints", () => {
     };
 
     await createUser(newUserData);
-    const res = await request(app).post("/api/v1/login").send({
+    const res = await loginUser({
       email: newUserData.email,
       password: "password456",
     });
@@ -120,7 +123,6 @@ describe("User API Endpoints", () => {
   });
 
   it("should fail when user tries to login with invalid data", async () => {
-    // Subhannallah this part (signing up) has been repeated like 4 times now, it will be a nighmare to maintain if forexample I want to add first and lastname to signup requirement
     const newUserData = {
       username: "testuser",
       email: "login@test.com",
@@ -128,9 +130,9 @@ describe("User API Endpoints", () => {
     };
 
     await createUser(newUserData);
-    const res = await request(app).post("/api/v1/login").send({
-      email: "myemail.com",
-      password: "password123",
+    const res = await loginUser({
+      email: "mymail.com",
+      password: newUserData.password,
     });
 
     expect(res.status).toBe(400);
