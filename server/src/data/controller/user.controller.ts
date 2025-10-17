@@ -14,7 +14,7 @@ export class UserController {
       if (error instanceof ZodError) {
         res.status(400).json({
           message: "Invalid input",
-          errors: z.treeifyError(error).errors,
+          errors: (z.treeifyError(error) as any)["properties"],
         });
         return;
       }
@@ -38,7 +38,6 @@ export class UserController {
   static async handleLogin(req: Request, res: Response) {
     try {
       const { email, password } = userLoginSchema.parse(req.body);
-
       const user = await UserModel.findByEmail(email);
       if (!user) {
         res.status(401).json({ message: "Invalid credentials" });
@@ -61,12 +60,12 @@ export class UserController {
         created_at: user.created_at,
       };
 
-      res.status(200).json({ message: "Login Successful", user: publicUser });
+      res.status(200).json({ message: "Login successful", user: publicUser });
     } catch (error) {
       if (error instanceof ZodError) {
         res.status(400).json({
           message: "Invalid input",
-          errors: z.treeifyError(error).errors,
+          errors: (z.treeifyError(error) as any)["properties"],
         });
         return;
       }

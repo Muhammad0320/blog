@@ -2,9 +2,19 @@ import request from "supertest";
 import express from "express";
 import userRouter from "./user.route";
 import pool from "../db";
+import session from "express-session";
 
 const app = express();
 app.use(express.json());
+
+app.use(
+  session({
+    secret: "a_secret_for_testing_only",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
 app.use("/api/v1", userRouter);
 
 describe("User API Endpoints", () => {
@@ -65,5 +75,65 @@ describe("User API Endpoints", () => {
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty("errors");
     expect(res.body.errors).toHaveProperty("password");
+  });
+
+  it("should successfully login user with valid credentials ans return a session cookie", async () => {
+    // I've repeated the exact same thing multitple times to simulate succesful signup
+    const newUserData = {
+      username: "testuser",
+      email: "login@test.com",
+      password: "password123",
+    };
+
+    await request(app).post("/api/v1/users").send(newUserData);
+
+    const res = await request(app).post("/api/v1/login").send({
+      email: newUserData.email,
+      password: newUserData.password,
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.body.message).toBe("Login successful");
+    expect(res.body.user.email).toBe(newUserData.email);
+
+    expect(res.headers["set-cookie"]).toBeDefined();
+  });
+
+  it("should fails when a user tries to login with incorrect password", async () => {
+    const newUserData = {
+      username: "testuser",
+      email: "login@test.com",
+      password: "password123",
+    };
+
+    await request(app).post("/api/v1/users").send(newUserData);
+
+    const res = await request(app).post("/api/v1/login").send({
+      email: newUserData.email,
+      password: "password456",
+    });
+
+    expect(res.status).toBe(401);
+    expect(res.body.message).toBe("Invalid credentials");
+  });
+
+  it("should fail when user tries to login with invalid data", async () => {
+    // Subhannallah this part (signing up) has been repeated like 4 times now, it will be a nighmare to maintain if forexample I want to add first and lastname to signup requirement
+    const newUserData = {
+      username: "testuser",
+      email: "login@test.com",
+      password: "password123",
+    };
+
+    await request(app).post("/api/v1/users").send(newUserData);
+
+    const res = await request(app).post("/api/v1/login").send({
+      email: "myemail.com",
+      password: "password123",
+    });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty("errors");
+    expect(res.body.errors).toHaveProperty("email");
   });
 });
