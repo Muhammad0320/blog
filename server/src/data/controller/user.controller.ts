@@ -9,7 +9,7 @@ export class UserController {
     try {
       const userData = userCreateSchema.parse(req.body);
       const userId = await UserModel.create(userData);
-      res.status(201).json({ userId, message: "User successfully created" });
+      res.status(201).json({ userId, message: "User created successfully" });
     } catch (error) {
       if (error instanceof ZodError) {
         res.status(400).json({
