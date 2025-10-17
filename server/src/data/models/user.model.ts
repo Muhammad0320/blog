@@ -37,7 +37,7 @@ export class UserModel {
     ]);
 
     if (existingUser.length > 0) {
-      throw new Error("Username or email already exists");
+      throw new Error("Username or email already exists.");
     }
 
     // Hash the password
