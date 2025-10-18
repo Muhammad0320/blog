@@ -43,7 +43,7 @@ export class PostModel {
   static async create(newPost: NewPostData): Promise<number> {
     const { title, content, userId } = newPost;
 
-    const sql = `INSERT INTO posts (title, content, userId) VALUES (?, ?, ?)`;
+    const sql = `INSERT INTO posts (title, content, user_id) VALUES (?, ?, ?)`;
     const values = [title, content, userId];
 
     try {

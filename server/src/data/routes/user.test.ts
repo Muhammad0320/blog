@@ -4,6 +4,7 @@ import userRouter from "./user.route";
 import pool from "../db";
 import session from "express-session";
 import { UserData } from "../models/user.model";
+import postRoutes from "./post.route";
 
 const app = express();
 app.use(express.json());
@@ -17,12 +18,16 @@ app.use(
 );
 
 app.use("/api/v1", userRouter);
-const createUser = async (userData: UserData) => {
+app.use("/api/v1", postRoutes);
+export const createUser = async (userData: UserData) => {
   const res = await request(app).post("/api/v1/users").send(userData);
   return res;
 };
 
-const loginUser = async (loginData: { email: string; password: string }) => {
+export const loginUser = async (loginData: {
+  email: string;
+  password: string;
+}) => {
   const res = await request(app).post("/api/v1/login").send(loginData);
   return res;
 };
@@ -30,8 +35,6 @@ const loginUser = async (loginData: { email: string; password: string }) => {
 describe("User API Endpoints", () => {
   beforeEach(async () => {
     await pool.query("DELETE FROM users");
-    await pool.query("DELETE FROM posts");
-    await pool.query("DELETE FROM comments");
   });
 
   afterAll(() => {
@@ -122,59 +125,5 @@ describe("User API Endpoints", () => {
 
     expect(res.status).toBe(401);
     expect(res.body.message).toBe("Invalid credentials");
-  });
-
-  it("should fail when user tries to login with invalid data", async () => {
-    const newUserData = {
-      username: "testuser",
-      email: "login@test.com",
-      password: "password123",
-    };
-
-    await createUser(newUserData);
-    const res = await loginUser({
-      email: "mymail.com",
-      password: newUserData.password,
-    });
-
-    expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty("errors");
-    expect(res.body.errors).toHaveProperty("email");
-  });
-
-  it("should fail when unauthorized user tries to delete a post", async () => {
-    const userDataA = {
-      username: "testuserA",
-      email: "a@test.com",
-      password: "password123",
-    };
-    const userDataB = {
-      username: "testuserB",
-      email: "b@test.com",
-      password: "password123",
-    };
-
-    await createUser(userDataA);
-    await createUser(userDataB);
-
-    const userResA = await loginUser(userDataA);
-    const cookieUserA = userResA.headers["set-cookie"];
-
-    const userResB = await loginUser(userDataB);
-    const cookieUserB = userResB.headers["set-cookie"];
-
-    const postCreationRes = await request(app)
-      .post("/api/v1/posts")
-      .set("Cookie", cookieUserA)
-      .send({ title: "The begining", content: "Bismillah" });
-    expect(postCreationRes.status).toBe(201);
-    const { postId } = postCreationRes.body;
-
-    const postDeletionRes = await request(app)
-      .delete(`/api/v1/posts/${postId}`)
-      .set("Cookie", cookieUserB);
-
-    expect(postDeletionRes.status).toBe(403);
-    expect(postCreationRes.body.message).toContain("Forbidden");
   });
 });

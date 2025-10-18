@@ -20,8 +20,8 @@ export class PostController {
   static async handleCreatePost(req: Request, res: Response) {
     try {
       const { title, content } = req.body;
-
       const userId = req.session.userId as number;
+      console.log("------------------- UserId", userId);
 
       if (!title || !content) {
         res.status(400).json({ message: "Title and Content are required" });
