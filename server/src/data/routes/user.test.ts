@@ -1,12 +1,7 @@
 import request from "supertest";
-import express from "express";
-import userRouter from "./user.route";
 import pool from "../db";
-import session from "express-session";
-import { UserData } from "../models/user.model";
-import postRoutes from "./post.route";
 import app from "../../test-utils/testApp";
-import { createUser, loginUser } from "../middleware/middleware.test";
+import { createUser, loginUser } from "../../test-utils/helpers";
 
 describe("User API Endpoints", () => {
   beforeEach(async () => {

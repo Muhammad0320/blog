@@ -1,36 +1,7 @@
-import session from "express-session";
 import request from "supertest";
 import pool from "../db";
-import express from "express";
-import userRouter from "../routes/user.route";
-import postRoutes from "../routes/post.route";
-import { UserData } from "../models/user.model";
-
-const app = express();
-app.use(express.json());
-app.use(
-  session({
-    secret: "a_secret_for_testing_only",
-    resave: false,
-    saveUninitialized: false,
-  })
-);
-
-app.use("/api/v1", userRouter);
-app.use("/api/v1", postRoutes);
-
-export const createUser = async (userData: UserData) => {
-  const res = await request(app).post("/api/v1/users").send(userData);
-  return res;
-};
-
-export const loginUser = async (loginData: {
-  email: string;
-  password: string;
-}) => {
-  const res = await request(app).post("/api/v1/login").send(loginData);
-  return res;
-};
+import app from "../../test-utils/testApp";
+import { createUser, loginUser } from "../../test-utils/helpers";
 
 describe("Authorization Middleware", () => {
   beforeEach(async () => {
