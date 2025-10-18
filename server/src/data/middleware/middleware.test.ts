@@ -52,4 +52,33 @@ describe("Authorization Middleware", () => {
     expect(postDeletionRes.status).toBe(403);
     expect(postDeletionRes.body.message).toContain("Forbidden");
   });
+
+  it("should authenticate user with a valid cookie", async () => {
+    const userData = {
+      username: "testuserA",
+      email: "a@test.com",
+      password: "password123",
+    };
+
+    await createUser(userData);
+    const loginRes = await loginUser(userData);
+    const cookie = loginRes.headers["set-cookie"];
+
+    const postRes = await request(app)
+      .post("/api/v1/posts")
+      .set("Cookie", cookie)
+      .send({ title: "The Beginning", content: "Bismillah" });
+
+    expect(postRes.status).toBe(201);
+    expect(postRes.body).toHaveProperty("postId");
+  });
+
+  it("should fail without a cookie", async () => {
+    const postRes = await request(app)
+      .post("/api/v1/posts")
+      .send({ title: "The Beginning", content: "Bismillah" });
+
+    expect(postRes.status).toBe(401);
+    expect(postRes.body.message).toContain("Unauthorized");
+  });
 });
