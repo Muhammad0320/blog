@@ -40,10 +40,16 @@ export class PostModel {
    * @param newPost An object containing the title and content for the new post.
    * @returns A promise that resolves to the ID of the newly created post.
    */
-  static async create(newPost: NewPostData): Promise<number> {
-    const { title, content, userId } = newPost;
+  static async create(data: {
+    title: string;
+    content: string;
+    userId: number;
+  }): Promise<number> {
+    const { title, content, userId } = data;
 
-    const sql = `INSERT INTO posts (title, content, user_id) VALUES (?, ?, ?)`;
+    console.log("----------------  POST MODEL", data);
+
+    const sql = "INSERT INTO posts (title, content, user_id) VALUES (?, ?, ?)";
     const values = [title, content, userId];
 
     try {
