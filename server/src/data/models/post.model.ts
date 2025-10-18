@@ -45,9 +45,8 @@ export class PostModel {
     content: string;
     userId: number;
   }): Promise<number> {
+    console.log("----------------  POST MODEL --------", data);
     const { title, content, userId } = data;
-
-    console.log("----------------  POST MODEL", data);
 
     const sql = "INSERT INTO posts (title, content, user_id) VALUES (?, ?, ?)";
     const values = [title, content, userId];

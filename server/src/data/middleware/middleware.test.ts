@@ -1,4 +1,4 @@
-import request from "supertest";
+import request, { agent } from "supertest";
 import pool from "../db";
 import app from "../../test-utils/testApp";
 import { createUser, loginUser } from "../../test-utils/helpers";
@@ -71,6 +71,55 @@ describe("Authorization Middleware", () => {
     expect(deleteAttemptRes.status).toBe(403);
     expect(deleteAttemptRes.body.message).toContain("Forbidden");
   });
+
+  // it("should prevent a user from deleting a post they do not own", async () => {
+  //   // --- ARRANGE ---
+  //   // We will create and log in each user sequentially to avoid race conditions.
+
+  //   // 1. Create and Log in User A
+  //   const userA_Data = {
+  //     username: "userA",
+  //     email: "a@test.com",
+  //     password: "password123",
+  //   };
+
+  //   const agentA = agent(app);
+  //   const userA = await agentA.post("/api/v1/posts").send(userA_Data);
+  //   expect(userA.status).toBe(201); // Verify user creation was successful
+  //   const loginResA = await agentA.post("/api/v1/login").send(userA_Data);
+  //   console.log(loginResA.body, "----------------");
+  //   expect(loginResA.status).toBe(200); // Verify login was successful
+
+  //   // 2. Create and Log in User B
+  //   const userB_Data = {
+  //     username: "userB",
+  //     email: "b@test.com",
+  //     password: "password123",
+  //   };
+  //   const agentB = agent(app);
+  //   const userB = await agentA.post("/api/v1/posts").send(userB_Data);
+  //   expect(userB.status).toBe(201); // Verify user creation was successful
+  //   const loginResB = await agentA.post("/api/v1/login").send(userB_Data);
+  //   console.log(loginResA.body, "----------------");
+  //   expect(loginResB.status).toBe(200); // Verify login was successful
+
+  //   // 3. As User A, create a new post. We know User A is fully logged in.
+  //   const postCreationRes = await agentA
+  //     .post("/api/v1/posts")
+  //     .send({ title: "User A Post", content: "This is my post." });
+
+  //   expect(postCreationRes.status).toBe(201);
+  //   const { postId } = postCreationRes.body;
+
+  //   // --- ACT ---
+  //   // 4. As User B, try to delete the post created by User A.
+  //   const deleteAttemptRes = await agentB.delete(`/api/v1/posts/${postId}`);
+
+  //   // --- ASSERT ---
+  //   // 5. Expect a 403 Forbidden error, proving our authorization works.
+  //   expect(deleteAttemptRes.status).toBe(403);
+  //   expect(deleteAttemptRes.body.message).toContain("Forbidden");
+  // });
 
   // it("should authenticate user with a valid cookie", async () => {
   //   const userData = {
