@@ -30,6 +30,8 @@ const loginUser = async (loginData: { email: string; password: string }) => {
 describe("User API Endpoints", () => {
   beforeEach(async () => {
     await pool.query("DELETE FROM users");
+    await pool.query("DELETE FROM posts");
+    await pool.query("DELETE FROM comments");
   });
 
   afterAll(() => {
@@ -138,5 +140,41 @@ describe("User API Endpoints", () => {
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty("errors");
     expect(res.body.errors).toHaveProperty("email");
+  });
+
+  it("should fail when unauthorized user tries to delete a post", async () => {
+    const userDataA = {
+      username: "testuserA",
+      email: "a@test.com",
+      password: "password123",
+    };
+    const userDataB = {
+      username: "testuserB",
+      email: "b@test.com",
+      password: "password123",
+    };
+
+    await createUser(userDataA);
+    await createUser(userDataB);
+
+    const userResA = await loginUser(userDataA);
+    const cookieUserA = userResA.headers["set-cookie"];
+
+    const userResB = await loginUser(userDataB);
+    const cookieUserB = userResB.headers["set-cookie"];
+
+    const postCreationRes = await request(app)
+      .post("/api/v1/posts")
+      .set("Cookie", cookieUserA)
+      .send({ title: "The begining", content: "Bismillah" });
+    expect(postCreationRes.status).toBe(201);
+    const { postId } = postCreationRes.body;
+
+    const postDeletionRes = await request(app)
+      .delete(`/api/v1/posts/${postId}`)
+      .set("Cookie", cookieUserB);
+
+    expect(postDeletionRes.status).toBe(403);
+    expect(postCreationRes.body.message).toContain("Forbidden");
   });
 });
