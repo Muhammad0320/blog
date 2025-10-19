@@ -1,19 +1,9 @@
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import pool from "../db";
+import { posts as Post } from "../../generated/prisma";
+import prisma from "../../db/prisma";
 
-export interface Post extends RowDataPacket {
-  id: number;
-  title: string;
-  content: string;
-  created_at?: Date;
-  userId: number;
-}
-
-interface NewPostData {
-  title: string;
-  content: string;
-  userId: number;
-}
+export { Post };
 
 // A class to group our post-related functions
 export class PostModel {
@@ -22,17 +12,7 @@ export class PostModel {
    * @returns A promise that resolves to an array of posts.
    */
   static async getAll(): Promise<Post[]> {
-    const sql = `SELECT * FROM posts`;
-
-    try {
-      const [rows] = await pool.query<Post[]>(sql);
-
-      return rows;
-    } catch (error) {
-      console.error("Error fetching posts:", error);
-
-      throw new Error("Could not fetch posts.");
-    }
+    return prisma.posts.findMany();
   }
 
   /**
@@ -44,48 +24,21 @@ export class PostModel {
     title: string;
     content: string;
     userId: number;
-  }): Promise<number> {
-    console.log("----------------  POST MODEL --------", data);
+  }): Promise<Post> {
     const { title, content, userId } = data;
-
-    const sql = "INSERT INTO posts (title, content, user_id) VALUES (?, ?, ?)";
-    const values = [title, content, userId];
-
-    try {
-      const [result] = await pool.query<ResultSetHeader>(sql, values);
-      return result.insertId;
-    } catch (error) {
-      console.error("Error creating post:", error);
-      throw new Error("Could not create post.");
-    }
+    return prisma.posts.create({
+      data: { title, content, users: { connect: { id: userId } } },
+    });
   }
 
   static async getById(id: number): Promise<Post | null> {
-    const sql = `SELECT * FROM posts
-            WHERE id = ?
-            `;
-    try {
-      const [rows] = await pool.query<Post[]>(sql, [id]);
-
-      return rows[0] || null;
-    } catch (error) {
-      console.error(`Error fetching post with id ${id}:`, error);
-      throw new Error("Could not fetch post!");
-    }
+    return prisma.posts.findUnique({ where: { id } });
   }
 
-  static async delete(id: number): Promise<number> {
-    const sql = `DELETE FROM posts 
-                  WHERE id = ?
-                  `;
-    try {
-      const [result] = await pool.query<ResultSetHeader>(sql, [id]);
-
-      return result.affectedRows;
-    } catch (error) {
-      console.error("Error deleting post", error);
-      throw new Error("Could not delete post");
-    }
+  static async delete(id: number): Promise<Post> {
+    return prisma.posts.delete({
+      where: { id },
+    });
   }
 
   /**
@@ -97,37 +50,12 @@ export class PostModel {
   static async update(
     id: number,
     data: { title?: string; content?: string }
-  ): Promise<number> {
+  ): Promise<Post> {
     const { title, content } = data;
 
-    const setParts: string[] = [];
-    const values: (string | number)[] = [];
-
-    if (title) {
-      setParts.push("title = ?");
-      values.push(title);
-    }
-    if (content) {
-      setParts.push("content = ?");
-      values.push(content);
-    }
-
-    if (setParts.length === 0) {
-      return 0;
-    }
-
-    const setClause = setParts.join(", ");
-    values.push(id);
-
-    const sql = `UPDATE posts SET ${setClause} WHERE id = ?`;
-
-    try {
-      const [result] = await pool.query<ResultSetHeader>(sql, values);
-
-      return result.affectedRows;
-    } catch (error) {
-      console.error("Error updating post", error);
-      throw new Error("Could not update post");
-    }
+    return prisma.posts.update({
+      where: { id },
+      data: { title, content },
+    });
   }
 }
