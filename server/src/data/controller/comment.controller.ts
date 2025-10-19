@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { CommentModel } from "../models/comment.model";
+import z, { ZodError } from "zod";
+import { commentCreateSchema } from "../../lib/validators";
 
 export class CommentController {
   static async handleGetAllForPosts(req: Request, res: Response) {
@@ -18,17 +20,13 @@ export class CommentController {
   static async handleCreate(req: Request, res: Response) {
     try {
       const postId = req.postId as number;
-      const { content, author } = req.body;
-
-      if (!content) {
-        res.status(400).json({ message: "The 'content' field is required " });
-        return;
-      }
+      const userId = req.session.userId as number;
+      const { content } = commentCreateSchema.parse(req.body);
 
       const newCommentId = await CommentModel.create({
         content,
         postId,
-        author,
+        userId,
       });
 
       res.status(201).json({
@@ -37,6 +35,14 @@ export class CommentController {
       });
     } catch (error) {
       console.error("Contoller error: Could not create comment", error);
+
+      if (error instanceof ZodError) {
+        res.status(400).json({
+          message: "Invalid input",
+          errors: (z.treeifyError(error) as any)["properties"],
+        });
+        return;
+      }
 
       if (
         error &&
