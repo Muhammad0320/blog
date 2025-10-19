@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model comments {
+  id         Int       @id @default(autoincrement())
+  content    String    @db.Text
+  author     String?   @db.VarChar(255)
+  post_id    Int
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+  posts      posts     @relation(fields: [post_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "comments_ibfk_1")
+
+  @@index([post_id], map: "post_id")
+}
+
+model posts {
+  id         Int        @id @default(autoincrement())
+  title      String     @db.VarChar(255)
+  content    String     @db.Text
+  created_at DateTime?  @default(now()) @db.Timestamp(0)
+  user_id    Int
+  comments   comments[]
+  users      users      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_user")
+
+  @@index([user_id], map: "fk_user")
+}
+
+model users {
+  id         Int        @id @default(autoincrement())
+  username   String     @unique(map: "username") @db.VarChar(255)
+  email      String     @unique(map: "email") @db.VarChar(255)
+  password   String     @db.VarChar(255)
+  created_at DateTime?  @default(now()) @db.Timestamp(0)
+  role       users_role @default(user)
+  posts      posts[]
+}
+
+enum users_role {
+  user
+  admin
+}
