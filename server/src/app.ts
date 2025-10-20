@@ -9,18 +9,11 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
-
-console.log(
-  "--------------",
-  process.env.SESSION_SECRET,
-  "-------------------"
-);
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "my_default_secret_key",
     resave: false,
     saveUninitialized: false,
-
     cookie: {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,

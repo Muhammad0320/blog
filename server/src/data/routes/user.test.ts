@@ -45,7 +45,7 @@ describe("User API Endpoints", () => {
     const res = await createUser(secondUser);
 
     expect(res.status).toBe(409);
-    expect(res.body.message).toBe("Username or email already exists.");
+    expect(res.body.message).toBe("Username or email already exists");
   });
 
   it("should fail to create a user with invalid data (e.g., short password )", async () => {
