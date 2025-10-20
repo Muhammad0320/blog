@@ -8,8 +8,10 @@ export class UserController {
   static async handleCreate(req: Request, res: Response) {
     try {
       const userData = userCreateSchema.parse(req.body);
-      const userId = await UserModel.create(userData);
-      res.status(201).json({ userId, message: "User created successfully" });
+      const newUser = await UserModel.create(userData);
+      res
+        .status(201)
+        .json({ userId: newUser.id, message: "User created successfully" });
     } catch (error) {
       if (error instanceof ZodError) {
         res.status(400).json({
@@ -58,6 +60,7 @@ export class UserController {
         username: user.username,
         email: user.email,
         created_at: user.created_at,
+        role: user.role,
       };
 
       res.status(200).json({ message: "Login successful", user: publicUser });

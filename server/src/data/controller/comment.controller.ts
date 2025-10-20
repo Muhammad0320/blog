@@ -23,7 +23,7 @@ export class CommentController {
       const userId = req.session.userId as number;
       const { content } = commentCreateSchema.parse(req.body);
 
-      const newCommentId = await CommentModel.create({
+      const newComment = await CommentModel.create({
         content,
         postId,
         userId,
@@ -31,7 +31,7 @@ export class CommentController {
 
       res.status(201).json({
         message: "Comment successfully created!",
-        commentId: newCommentId,
+        commentId: newComment.id,
       });
     } catch (error) {
       console.error("Contoller error: Could not create comment", error);
