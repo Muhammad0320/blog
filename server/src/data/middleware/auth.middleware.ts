@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import pool from "../db";
 import { Post } from "../models/post.model";
+import prisma from "../../db/prisma";
 
 export const isAuthenicated = async (
   req: Request,
@@ -31,14 +32,16 @@ export const canModifyPost = async (
       return next();
     }
 
-    const sql = `SELECT user_id FROM posts WHERE id = ?`;
-    const [rows] = await pool.query<Post[]>(sql, [postId]);
+    const post = await prisma.posts.findUnique({
+      where: { id: postId },
+      select: { user_id: true },
+    });
 
-    if (rows.length === 0) {
-      return res.status(404).json({ message: "Post not found!" });
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
     }
 
-    const authorUserId = rows[0].userId;
+    const authorUserId = post.user_id;
     if (authorUserId !== loggedUserId) {
       return res.status(403).json({
         message: "Forbidden: You're not permitted to perform this action!",

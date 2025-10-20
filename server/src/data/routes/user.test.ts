@@ -1,15 +1,15 @@
 import request from "supertest";
-import pool from "../db";
 import app from "../../test-utils/testApp";
 import { createUser, loginUser } from "../../test-utils/helpers";
+import prisma from "../../db/prisma";
 
 describe("User API Endpoints", () => {
   beforeEach(async () => {
-    await pool.query("DELETE FROM users");
+    await prisma.users.deleteMany();
   });
 
-  afterAll(() => {
-    pool.end();
+  afterAll(async () => {
+    await prisma.$disconnect();
   });
 
   it("should create a new user successfully", async () => {
