@@ -2,6 +2,15 @@ import { Router } from "express";
 import { UserController } from "../controller/user.controller";
 import { isAuthenicated } from "../middleware/auth.middleware";
 import { validateUserId } from "../middleware/validation.middleware";
+import rateLimit from "express-rate-limit";
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 60,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: "Too many requests from this IP, please try again in 15 minutes",
+});
 
 const userRouter = Router();
 

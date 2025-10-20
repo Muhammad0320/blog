@@ -1,5 +1,3 @@
-import { ResultSetHeader, RowDataPacket } from "mysql2";
-import pool from "../db";
 import { z } from "zod";
 import { userCreateSchema } from "../../lib/validators";
 import { Password } from "../../lib/auth";
@@ -19,7 +17,13 @@ export type UserProfileInfo = {
 };
 
 export class UserModel {
-  static async create({ username, email, password }: UserData): Promise<User> {
+  static async create({
+    username,
+    email,
+    password,
+    firstName,
+    lastName,
+  }: UserData): Promise<User> {
     const existingUser = await prisma.users.findFirst({
       where: { OR: [{ username }, { email }] },
     });
@@ -31,7 +35,7 @@ export class UserModel {
     const hashedPassword = await Password.hash(password);
 
     return prisma.users.create({
-      data: { username, email, password: hashedPassword },
+      data: { username, email, password: hashedPassword, firstName, lastName },
     });
   }
 
