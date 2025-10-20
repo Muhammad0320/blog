@@ -1,23 +1,17 @@
-import request, { agent } from "supertest";
-import pool from "../db";
+import request from "supertest";
 import app from "../../test-utils/testApp";
 import { createUser, loginUser } from "../../test-utils/helpers";
+import prisma from "../../db/prisma";
 
 describe("Authorization Middleware", () => {
   beforeEach(async () => {
-    await pool.query("SET FOREIGN_KEY_CHECKS = 0;");
-
-    // 2. Truncate each table individually. The order doesn't matter now.
-    await pool.query("TRUNCATE TABLE comments;");
-    await pool.query("TRUNCATE TABLE posts;");
-    await pool.query("TRUNCATE TABLE users;");
-
-    // 3. IMPORTANT: Re-enable foreign key checks to enforce data integrity.
-    await pool.query("SET FOREIGN_KEY_CHECKS = 1;");
+    await prisma.comments.deleteMany();
+    await prisma.posts.deleteMany();
+    await prisma.users.deleteMany();
   });
 
-  afterAll(() => {
-    pool.end();
+  afterAll(async () => {
+    await prisma.$disconnect();
   });
 
   it("should prevent a user from deleting a post they do not own", async () => {
@@ -45,7 +39,6 @@ describe("Authorization Middleware", () => {
     };
     const userB = await createUser(userB_Data);
     expect(userB.status).toBe(201); // Verify user creation was successful
-
     const loginResB = await loginUser(userB_Data);
     console.log(loginResB.body, "----------------");
     expect(loginResB.status).toBe(200); // Verify login was successful

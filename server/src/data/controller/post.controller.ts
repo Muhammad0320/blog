@@ -1,3 +1,4 @@
+import { Prisma } from "../../generated/prisma";
 import { PostModel } from "../models/post.model";
 import { Request, Response } from "express";
 
@@ -57,13 +58,18 @@ export class PostController {
     try {
       const postId = req.postId as number;
 
-      const affectedRow = await PostModel.delete(postId);
-      if (affectedRow) {
-        res.status(204).send();
-      } else {
-        res.status(404).json({ message: "Post not found" });
-      }
+      await PostModel.delete(postId);
+
+      return res.status(204).send();
     } catch (error) {
+      // This is the key part. We check for Prisma's specific "Record not found" error code.
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2025"
+      ) {
+        return res.status(404).json({ message: "Post not found." });
+      }
+
       console.error("Cannot delete post", error);
       res.status(500).json({ message: "Error deleting post" });
     }
@@ -74,13 +80,17 @@ export class PostController {
       const postId = req.postId as number;
       const { title, content } = req.body;
 
-      const affectdRow = await PostModel.update(postId, { title, content });
-      if (affectdRow) {
-        res.status(200).json({ message: "Post successfully updated" });
-      } else {
-        res.status(404).json({ message: "Post not found" });
-      }
+      const updatedPost = await PostModel.update(postId, { title, content });
+      res.status(200).json(updatedPost);
     } catch (error) {
+      // This is the key part. We check for Prisma's specific "Record not found" error code.
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2025"
+      ) {
+        return res.status(404).json({ message: "Post not found." });
+      }
+
       console.error("Cannot update post", error);
       res.status(500).json({ message: "Eror deleting post" });
     }

@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { CommentModel } from "../models/comment.model";
 import z, { ZodError } from "zod";
 import { commentCreateSchema } from "../../lib/validators";
+import { Prisma } from "../../generated/prisma";
 
 export class CommentController {
   static async handleGetAllForPosts(req: Request, res: Response) {
@@ -66,14 +67,17 @@ export class CommentController {
     try {
       const id = req.commentId as number;
 
-      const affectedRow = await CommentModel.delete(id);
-      if (affectedRow) {
-        res.status(204).send();
-        return;
+      await CommentModel.delete(id);
+      return res.status(204).send();
+    } catch (error) {
+      // This is the key part. We check for Prisma's specific "Record not found" error code.
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2025"
+      ) {
+        return res.status(404).json({ message: "Post not found." });
       }
 
-      res.status(404).json({ message: "comment not found" });
-    } catch (error) {
       console.error("Cannot delete comment", error);
 
       throw new Error("Error deleting comment");
@@ -90,14 +94,17 @@ export class CommentController {
         return;
       }
 
-      const affectedRow = await CommentModel.update(id, { content });
-
-      if (affectedRow) {
-        res.status(200).json({ message: "comment successfully updated" });
-      } else {
-        res.status(404).json({ message: "comment not found" });
-      }
+      const updatedComment = await CommentModel.update(id, { content });
+      res.status(200).json(updatedComment);
     } catch (error) {
+      // This is the key part. We check for Prisma's specific "Record not found" error code.
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2025"
+      ) {
+        return res.status(404).json({ message: "Post not found." });
+      }
+
       console.error("Could not update comment", error);
       throw new Error("Error updating comment");
     }
