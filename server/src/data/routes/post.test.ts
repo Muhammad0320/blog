@@ -50,7 +50,7 @@ describe("Post API Endpoints", () => {
     };
     const userA = await createUser(userA_Data);
     expect(userA.status).toBe(201); // Verify user creation was successful
-    await setTimeout(1 * 1000);
+    // await setTimeout(1 * 1000);
     const loginResA = await loginUser(userA_Data);
     expect(loginResA.status).toBe(200); // Verify login was successful
     const cookieUserA = loginResA.headers["set-cookie"];
@@ -67,7 +67,6 @@ describe("Post API Endpoints", () => {
     expect(loginResB.status).toBe(200); // Verify login was successful
     const cookieUserB = loginResB.headers["set-cookie"];
 
-    // 3. As User A, create a new post. We know User A is fully logged in.
     const postCreationRes = await request(app)
       .post("/api/v1/posts")
       .set("Cookie", cookieUserA)
@@ -76,18 +75,12 @@ describe("Post API Endpoints", () => {
     expect(postCreationRes.status).toBe(201);
     const { postId } = postCreationRes.body;
 
-    console.log(postCreationRes.body, "---------------------");
-
-    // --- ACT ---
-    // 4. As User B, try to delete the post created by User A.
     const deleteAttemptRes = await request(app)
       .delete(`/api/v1/posts/${postId}`)
       .set("Cookie", cookieUserB);
 
     console.log(deleteAttemptRes.body);
 
-    // --- ASSERT ---
-    // 5. Expect a 403 Forbidden error, proving our authorization works.
     expect(deleteAttemptRes.status).toBe(403);
     expect(deleteAttemptRes.body.message).toContain("Forbidden");
   });

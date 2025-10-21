@@ -16,16 +16,18 @@ describe("Authorization Middleware", () => {
   });
 
   it("should authenticate user with a valid cookie", async () => {
-    const userData = {
-      username: "testuserA",
-      email: "a@test.com",
+    const newUserData = {
+      username: "testuser",
+      email: "login@test.com",
       password: "password123",
     };
 
-    await createUser(userData);
-    await setTimeout(1 * 1000);
+    await createUser(newUserData);
+    const loginRes = await loginUser({
+      email: newUserData.email,
+      password: newUserData.password,
+    });
 
-    const loginRes = await loginUser(userData);
     expect(loginRes.status).toBe(200);
     const cookie = loginRes.headers["set-cookie"];
 

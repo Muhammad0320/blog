@@ -4,4 +4,6 @@ module.exports = {
   testEnvironment: "node",
   testMatch: ["**/src/**/*.test.ts"], // Looks for test files in src
   verbose: true,
+
+  maxWorkers: 1,
 };
