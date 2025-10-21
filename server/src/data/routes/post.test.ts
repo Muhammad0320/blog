@@ -2,6 +2,7 @@ import prisma from "../../db/prisma";
 import { createUser, loginUser } from "../../test-utils/helpers";
 import request from "supertest";
 import app from "../../test-utils/testApp";
+import { setTimeout } from "timers/promises";
 
 describe("Post API Endpoints", () => {
   beforeEach(async () => {
@@ -21,8 +22,8 @@ describe("Post API Endpoints", () => {
     };
 
     const user = await createUser(userData);
+    await setTimeout(1 * 1000);
     expect(user.status).toBe(201);
-
     const authUser = await loginUser(userData);
     expect(authUser.status).toBe(200);
     const userCookie = authUser.headers["set-cookie"];
@@ -41,9 +42,6 @@ describe("Post API Endpoints", () => {
   });
 
   it("should prevent a user from deleting a post they do not own", async () => {
-    // --- ARRANGE ---
-    // We will create and log in each user sequentially to avoid race conditions.
-
     // 1. Create and Log in User A
     const userA_Data = {
       username: "userA",
@@ -52,7 +50,7 @@ describe("Post API Endpoints", () => {
     };
     const userA = await createUser(userA_Data);
     expect(userA.status).toBe(201); // Verify user creation was successful
-    new Promise((resolve) => setTimeout(resolve, 1 * 1000));
+    await setTimeout(1 * 1000);
     const loginResA = await loginUser(userA_Data);
     expect(loginResA.status).toBe(200); // Verify login was successful
     const cookieUserA = loginResA.headers["set-cookie"];
@@ -77,6 +75,8 @@ describe("Post API Endpoints", () => {
 
     expect(postCreationRes.status).toBe(201);
     const { postId } = postCreationRes.body;
+
+    console.log(postCreationRes.body, "---------------------");
 
     // --- ACT ---
     // 4. As User B, try to delete the post created by User A.

@@ -29,8 +29,10 @@ export class PostController {
         res.status(400).json({ message: "Title and Content are required" });
       }
 
-      const postId = await PostModel.create({ title, content, userId });
-      res.status(201).json({ message: "Post created successfully", postId });
+      const post = await PostModel.create({ title, content, userId });
+      res
+        .status(201)
+        .json({ message: "Post created successfully", postId: post.id });
     } catch (error) {
       console.error("Controller Error: could not create post", error);
       res.status(500).json({ message: "error creating post" });

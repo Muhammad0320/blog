@@ -2,6 +2,7 @@ import request from "supertest";
 import app from "../../test-utils/testApp";
 import { createUser, loginUser } from "../../test-utils/helpers";
 import prisma from "../../db/prisma";
+import { setTimeout } from "timers/promises";
 
 describe("Authorization Middleware", () => {
   beforeEach(async () => {
@@ -22,6 +23,8 @@ describe("Authorization Middleware", () => {
     };
 
     await createUser(userData);
+    await setTimeout(1 * 1000);
+
     const loginRes = await loginUser(userData);
     expect(loginRes.status).toBe(200);
     const cookie = loginRes.headers["set-cookie"];
