@@ -4,7 +4,7 @@ import { PostController } from "../controller/post.controller";
 import { isAuthenicated, canModifyPost } from "../middleware/auth.middleware";
 import rateLimit from "express-rate-limit";
 
-const apiLimiter = rateLimit({
+export const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
   message: "You have exceeded the 100 requests in 15 minutes",
