@@ -5,7 +5,7 @@ import { validateUserId } from "../middleware/validation.middleware";
 import rateLimit from "express-rate-limit";
 
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 60,
+  windowMs: 15 * 60 * 1000,
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
@@ -14,9 +14,14 @@ const authLimiter = rateLimit({
 
 const userRouter = Router();
 
-userRouter.post("/users", UserController.handleCreate);
-userRouter.post("/login", UserController.handleLogin);
-userRouter.post("/logout", isAuthenicated, UserController.handleLogout);
+userRouter.post("/users", authLimiter, UserController.handleCreate);
+userRouter.post("/login", authLimiter, UserController.handleLogin);
+userRouter.post(
+  "/logout",
+  authLimiter,
+  isAuthenicated,
+  UserController.handleLogout
+);
 userRouter.get(
   "/users/:userId",
   validateUserId,
