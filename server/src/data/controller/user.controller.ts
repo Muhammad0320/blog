@@ -61,6 +61,8 @@ export class UserController {
         email: user.email,
         created_at: user.created_at,
         role: user.role,
+        firstName: user?.firstName,
+        lastName: user?.lastName,
       };
 
       res.status(200).json({ message: "Login successful", user: publicUser });

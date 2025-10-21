@@ -13,7 +13,9 @@ export type UserData = z.infer<typeof userCreateSchema>;
 export type UserProfileInfo = {
   id: number;
   username: string;
-  created_at: Date | null;
+  created_at: Date;
+  firstName?: string;
+  lastName?: string;
 };
 
 export class UserModel {
